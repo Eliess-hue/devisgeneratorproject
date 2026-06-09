@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+    themes: "devis --prefersdark";
+}
+
+@theme {
+    --color-base-100: #0A0A0A;
+    --color-base-200: #111111;
+    --color-base-300: #1a1a1a;
+    --color-base-content: #F9FAFB;
+    --color-primary: #3B82F6;
+    --color-primary-content: #ffffff;
+    --color-neutral: #2E2E2E;
+    --color-neutral-content: #F9FAFB;
+}
+
+* {
+    font-family: 'Inter', sans-serif;
+}
