@@ -1,0 +1,36 @@
+services:
+
+  backend:
+    build:
+      context: ./devisgenerator
+      dockerfile: Dockerfile
+    container_name: devis-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+    expose:
+      - "8080"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./devisgenerator-frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ""
+    container_name: devis-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
