@@ -7,6 +7,7 @@ import fr.devisgenerator.devisgenerator.entity.AppUser;
 import fr.devisgenerator.devisgenerator.entity.Client;
 import fr.devisgenerator.devisgenerator.entity.Quote;
 import fr.devisgenerator.devisgenerator.entity.QuoteLine;
+import fr.devisgenerator.devisgenerator.enums.QuoteStatus;
 import fr.devisgenerator.devisgenerator.exception.QuoteNotFoundException;
 import fr.devisgenerator.devisgenerator.repository.ClientRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteLineRepository;
@@ -59,7 +60,7 @@ class QuoteServiceImplTest {
                 .build();
 
         QuoteRequest request =
-                new QuoteRequest(1L, "DRAFT");
+                new QuoteRequest(1L, QuoteStatus.DRAFT);
 
         when(clientRepository.findById(1L))
                 .thenReturn(Optional.of(client));
@@ -78,7 +79,7 @@ class QuoteServiceImplTest {
         assertEquals("DEV-" + LocalDate.now().getYear() + "-001",
                 response.number());
 
-        assertEquals("DRAFT", response.status());
+        assertEquals(QuoteStatus.DRAFT, response.status());
 
         verify(quoteRepository).save(any(Quote.class));
     }
@@ -100,7 +101,7 @@ class QuoteServiceImplTest {
         Quote quote = Quote.builder()
                 .id(1L)
                 .number("DEV-2024-001")
-                .status("DRAFT")
+                .status(QuoteStatus.DRAFT)
                 .client(client)
                 .user(user)
                 .build();
@@ -133,7 +134,7 @@ class QuoteServiceImplTest {
         Quote quote = Quote.builder()
                 .id(1L)
                 .number("DEV-2024-001")
-                .status("DRAFT")
+                .status(QuoteStatus.DRAFT)
                 .client(client)
                 .user(user)
                 .build();

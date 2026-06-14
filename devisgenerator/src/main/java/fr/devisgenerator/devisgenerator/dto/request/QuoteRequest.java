@@ -1,12 +1,12 @@
 package fr.devisgenerator.devisgenerator.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import fr.devisgenerator.devisgenerator.enums.QuoteStatus;
 import jakarta.validation.constraints.NotNull;
 
 public record QuoteRequest(
         @NotNull(message = "Client is required")
         Long clientId,
 
-        @NotBlank(message = "Status is required")
-        String status) {
+        @NotNull(message = "Status is required")
+        QuoteStatus status) {
 }

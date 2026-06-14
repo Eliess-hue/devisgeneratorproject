@@ -2,6 +2,7 @@ package fr.devisgenerator.devisgenerator.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.devisgenerator.devisgenerator.dto.request.*;
+import fr.devisgenerator.devisgenerator.enums.QuoteStatus;
 import fr.devisgenerator.devisgenerator.repository.QuoteLineRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ class QuoteControllerIntegrationTest {
         QuoteRequest request =
                 new QuoteRequest(
                         clientId,
-                        "draft"
+                        QuoteStatus.DRAFT
                 );
 
         mockMvc.perform(
@@ -364,7 +365,7 @@ class QuoteControllerIntegrationTest {
         QuoteRequest request =
                 new QuoteRequest(
                         clientId,
-                        "draft"
+                        QuoteStatus.DRAFT
                 );
 
         String response =
