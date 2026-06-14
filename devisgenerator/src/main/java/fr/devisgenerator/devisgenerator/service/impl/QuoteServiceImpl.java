@@ -21,6 +21,7 @@ import fr.devisgenerator.devisgenerator.service.QuoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -101,6 +102,7 @@ public class QuoteServiceImpl implements QuoteService {
         );
     }
 
+    @Transactional
     @Override
     public QuoteResponse addLine(Long quoteId, QuoteLineRequest request, AppUser user) {
 
@@ -120,6 +122,7 @@ public class QuoteServiceImpl implements QuoteService {
         return toQuoteResponse(quote);
     }
 
+    @Transactional
     @Override
     public QuoteResponse deleteLine(Long quoteId, Long lineId, AppUser user) {
 
