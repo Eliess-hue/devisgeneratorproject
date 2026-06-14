@@ -2,6 +2,7 @@ package fr.devisgenerator.devisgenerator.security;
 
 import java.io.IOException;
 
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,30 +42,45 @@ public class JwtFilter extends OncePerRequestFilter {
         // 3. Extraire le token (après "Bearer ")
         String token = authHeader.substring(7);
 
-        // 4. Extraire le username depuis le token
-        String username = jwtService.extractUsername(token);
+        try {
 
-        // 5. Si username valide et pas encore authentifié → authentifier
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // 4. Extraire le username depuis le token
+            String username = jwtService.extractUsername(token);
 
-            var userDetails = userDetailsService.loadUserByUsername(username);
+            // 5. Si username valide et pas encore authentifié → authentifier
+            if (username != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (jwtService.isTokenValid(token, userDetails.getUsername())) {
+                var userDetails =
+                        userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                if (jwtService.isTokenValid(
+                        token,
+                        userDetails.getUsername()
+                )) {
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
 
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
 
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authToken);
+                }
             }
+
+        } catch (JwtException e) {
+
+            // Token invalide, expiré, malformé...
+            // On laisse le SecurityContext vide.
+            // Spring Security retournera un 401 si la ressource est protégée.
 
         }
 
