@@ -3,6 +3,7 @@ package fr.devisgenerator.devisgenerator.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import fr.devisgenerator.devisgenerator.enums.QuoteStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +23,10 @@ public class Quote {
     @Column(nullable = false)
     private String number;
 
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private QuoteStatus status = QuoteStatus.DRAFT;
 
     @Column(name = "total_ht")
     private BigDecimal totalHt;
