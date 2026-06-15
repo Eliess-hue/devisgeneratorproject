@@ -344,4 +344,58 @@ class QuoteServiceImplTest {
         );
     }
 
+    @Test
+    void createShouldResetCounterWhenLastQuoteIsFromPreviousYear() {
+
+        // Arrange
+        AppUser user = AppUser.builder()
+                .id(1L)
+                .username("john")
+                .role("ROLE_USER")
+                .build();
+
+        Client client = Client.builder()
+                .id(1L)
+                .name("ACME")
+                .email("contact@acme.com")
+                .user(user)
+                .build();
+
+        int currentYear = LocalDate.now().getYear();
+        int previousYear = currentYear - 1;
+
+        Quote lastQuote = Quote.builder()
+                .id(50L)
+                .number("DEV-" + previousYear + "-050")
+                .build();
+
+        QuoteRequest request =
+                new QuoteRequest(
+                        1L,
+                        QuoteStatus.DRAFT
+                );
+
+        when(clientRepository.findById(1L))
+                .thenReturn(Optional.of(client));
+
+        when(quoteRepository.findTopByOrderByIdDesc())
+                .thenReturn(Optional.of(lastQuote));
+
+        when(quoteRepository.save(any(Quote.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        QuoteResponse response =
+                quoteService.create(request, user);
+
+        // Assert
+        assertEquals(
+                "DEV-" + currentYear + "-001",
+                response.number()
+        );
+
+        verify(quoteRepository)
+                .save(any(Quote.class));
+    }
+
 }

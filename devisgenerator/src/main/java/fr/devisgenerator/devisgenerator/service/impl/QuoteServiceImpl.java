@@ -36,6 +36,7 @@ public class QuoteServiceImpl implements QuoteService {
     private final ClientRepository clientRepository;
     private final QuoteLineRepository quoteLineRepository;
 
+    @Transactional
     @Override
     public QuoteResponse create(QuoteRequest request, AppUser user) {
 
@@ -208,6 +209,12 @@ public class QuoteServiceImpl implements QuoteService {
 
         String[] parts =
                 lastNumber.split("-");
+
+        String lastYear = parts[1];
+
+        if (!lastYear.equals(String.valueOf(year))) {
+            return "DEV-" + year + "-001";
+        }
 
         int counter =
                 Integer.parseInt(parts[2]);
