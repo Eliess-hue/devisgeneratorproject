@@ -14,6 +14,7 @@ import QuoteInfoCard from '../components/quotelines/QuoteInfoCard.jsx'
 import QuoteHeader from '../components/quotelines/QuoteHeader.jsx'
 import QuoteLineForm from '../components/quotelines/QuoteLineForm.jsx'
 import QuoteLineModal from '../components/quotelines/QuoteLineModal.jsx'
+import ConfirmationModal from "../components/common/ConfirmationModal.jsx";
 
 export default function QuoteDetailPage() {
 
@@ -29,6 +30,12 @@ export default function QuoteDetailPage() {
 
     const [isLineModalOpen, setIsLineModalOpen] =
         useState(false)
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] =
+        useState(false)
+
+    const [lineToDelete, setLineToDelete] =
+        useState(null)
 
     const [lineForm, setLineForm] = useState({
         description: '',
@@ -138,27 +145,28 @@ export default function QuoteDetailPage() {
 
     }
 
-    const handleDeleteLine = async (
+    const handleDeleteLine = (
         lineId
     ) => {
 
-        const confirmed =
-            window.confirm(
-                'Supprimer cette ligne ?'
-            )
+        setLineToDelete(lineId)
 
-        if (!confirmed) {
-            return
-        }
+        setIsDeleteModalOpen(true)
+
+    }
+
+    const handleConfirmDeleteLine = async () => {
 
         try {
 
             await deleteQuoteLine(
                 id,
-                lineId
+                lineToDelete
             )
 
             await loadQuote()
+
+            closeDeleteModal()
 
         } catch (err) {
 
@@ -169,6 +177,14 @@ export default function QuoteDetailPage() {
             )
 
         }
+
+    }
+
+    const closeDeleteModal = () => {
+
+        setIsDeleteModalOpen(false)
+
+        setLineToDelete(null)
 
     }
 
@@ -251,6 +267,15 @@ export default function QuoteDetailPage() {
                 />
 
             </QuoteLineModal>
+
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                title="Supprimer la ligne"
+                message="Voulez-vous vraiment supprimer cette ligne ?"
+                onConfirm={handleConfirmDeleteLine}
+                onClose={closeDeleteModal}
+                confirmLabel="Supprimer"
+            />
 
             <QuoteLinesTable
                 lines={quote.lines}
