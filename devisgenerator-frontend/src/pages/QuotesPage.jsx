@@ -9,6 +9,7 @@ import {
 import {getClients} from "../api/apiClient.js";
 import QuoteModal from "../components/quotes/QuoteModal.jsx";
 import QuoteTable from "../components/quotes/QuoteTable.jsx";
+import ConfirmationModal from "../components/common/ConfirmationModal.jsx";
 
 export default function QuotesPage() {
 
@@ -26,6 +27,12 @@ export default function QuotesPage() {
     const [search, setSearch] = useState('')
 
     const [error, setError] = useState(null)
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] =
+        useState(false)
+
+    const [quoteToDelete, setQuoteToDelete] =
+        useState(null)
 
     const handleNewQuote = () => {
         if (clients.length === 0) {
@@ -155,21 +162,27 @@ export default function QuotesPage() {
 
     }
 
-    const handleDeleteQuote = async (id) => {
+    const handleDeleteQuote = (id) => {
 
-        const confirmed = window.confirm(
-            'Supprimer ce devis ?'
-        )
+        setQuoteToDelete(id)
 
-        if (!confirmed) {
-            return
-        }
+        setIsDeleteModalOpen(true)
+
+    }
+
+    const handleConfirmDelete = async () => {
 
         try {
 
-            await deleteQuote(id)
+            await deleteQuote(
+                quoteToDelete
+            )
 
             await loadQuotes()
+
+            setIsDeleteModalOpen(false)
+
+            setQuoteToDelete(null)
 
         } catch (err) {
 
@@ -180,6 +193,14 @@ export default function QuotesPage() {
             )
 
         }
+
+    }
+
+    const closeDeleteModal = () => {
+
+        setIsDeleteModalOpen(false)
+
+        setQuoteToDelete(null)
 
     }
 
@@ -209,6 +230,15 @@ export default function QuotesPage() {
                 setStatus={setStatus}
                 onSave={handleSaveQuote}
                 onClose={closeModal}
+            />
+
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                title="Supprimer le devis"
+                message="Voulez-vous vraiment supprimer ce devis ?"
+                onConfirm={handleConfirmDelete}
+                onClose={closeDeleteModal}
+                confirmLabel="Supprimer"
             />
 
             <div className="space-y-6">
