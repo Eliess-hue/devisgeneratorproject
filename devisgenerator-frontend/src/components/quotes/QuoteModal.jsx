@@ -129,20 +129,24 @@ export default function QuoteModal({
                         }
                     >
 
-                        <option value="draft">
+                        <option value="DRAFT">
                             Brouillon
                         </option>
 
-                        <option value="pending">
+                        <option value="PENDING">
                             En attente
                         </option>
 
-                        <option value="accepted">
+                        <option value="ACCEPTED">
                             Accepté
                         </option>
 
-                        <option value="refused">
+                        <option value="REFUSED">
                             Refusé
+                        </option>
+
+                        <option value="EXPIRED">
+                            Expiré
                         </option>
 
                     </select>

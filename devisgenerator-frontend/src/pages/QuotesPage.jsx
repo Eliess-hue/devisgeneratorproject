@@ -21,7 +21,7 @@ export default function QuotesPage() {
     const [editingQuote, setEditingQuote] = useState(null)
 
     const [clientId, setClientId] = useState('')
-    const [status, setStatus] = useState('draft')
+    const [status, setStatus] = useState('DRAFT')
 
     const [search, setSearch] = useState('')
 
@@ -41,7 +41,7 @@ export default function QuotesPage() {
         setEditingQuote(null)
 
         setClientId('')
-        setStatus('draft')
+        setStatus('DRAFT')
 
         setIsModalOpen(true)
 
@@ -54,7 +54,7 @@ export default function QuotesPage() {
         setEditingQuote(null)
 
         setClientId('')
-        setStatus('draft')
+        setStatus('DRAFT')
 
     }
 
