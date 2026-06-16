@@ -3,37 +3,38 @@ export default function QuoteStatusBadge({
                                          }) {
 
     const styles = {
-        draft:
+        DRAFT:
             'badge px-3 py-3 bg-slate-700 text-slate-200 border-none rounded-lg',
 
-        pending:
+        PENDING:
             'badge px-3 py-3 bg-[#0B2E5B] text-[#4EA1FF] border-none rounded-lg',
 
-        accepted:
+        ACCEPTED:
             'badge px-3 py-3 bg-[#064E3B] text-[#34D399] border-none rounded-lg',
 
-        refused:
-            'badge px-3 py-3 bg-[#7F1D1D] text-[#FCA5A5] border-none rounded-lg'
+        REFUSED:
+            'badge px-3 py-3 bg-[#7F1D1D] text-[#FCA5A5] border-none rounded-lg',
+
+        EXPIRED:
+            'badge px-3 py-3 bg-[#78350F] text-[#FCD34D] border-none rounded-lg'
     }
 
     const labels = {
-        draft: 'Brouillon',
-        pending: 'En attente',
-        accepted: 'Accepté',
-        refused: 'Refusé'
+        DRAFT: 'Brouillon',
+        PENDING: 'En attente',
+        ACCEPTED: 'Accepté',
+        REFUSED: 'Refusé',
+        EXPIRED: 'Expiré'
     }
-
-    const normalizedStatus =
-        status?.toLowerCase()
 
     return (
         <span
             className={
-                styles[normalizedStatus] ||
+                styles[status] ||
                 'badge bg-slate-700 text-slate-200 border-none rounded-lg'
             }
         >
-            {labels[normalizedStatus] || status}
+            {labels[status] || status}
         </span>
     )
 }
