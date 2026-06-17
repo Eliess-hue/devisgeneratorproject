@@ -70,6 +70,7 @@ public class DashboardServiceImpl implements DashboardService{
                         .limit(5)
                         .map(quote ->
                                 new DashboardQuoteResponse(
+                                        quote.getId(),
                                         quote.getNumber(),
                                         quote.getClient().getName(),
                                         quote.getStatus(),
