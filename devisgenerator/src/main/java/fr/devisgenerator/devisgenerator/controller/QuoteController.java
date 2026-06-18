@@ -90,6 +90,8 @@ public class QuoteController {
         return ResponseEntity.noContent().build();
     }
 
+    // Partie Lines
+
     @Operation(
             summary = "Ajouter une ligne",
             description = "Ajoute une ligne à un devis et recalcule les totaux"
@@ -108,6 +110,25 @@ public class QuoteController {
                                 user
                         )
                 );
+    }
+
+    @Operation(
+            summary = "Modifier une ligne de devis",
+            description = "Met à jour une ligne de devis et recalcule les totaux"
+    )
+    @PutMapping("/{quoteId}/lines/{lineId}")
+    public QuoteResponse updateLine(
+            @PathVariable Long quoteId,
+            @PathVariable Long lineId,
+            @Valid @RequestBody QuoteLineRequest request,
+            @AuthenticationPrincipal AppUser user) {
+
+        return quoteService.updateLine(
+                quoteId,
+                lineId,
+                request,
+                user
+        );
     }
 
     @Operation(

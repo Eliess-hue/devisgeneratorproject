@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -178,6 +179,58 @@ class QuoteControllerIntegrationTest {
                                 )
                 )
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void updateLineShouldReturn200()
+            throws Exception {
+
+        String token = getToken();
+
+        Long clientId =
+                createClient(
+                        token,
+                        validClientRequest()
+                );
+
+        Long quoteId =
+                createQuote(
+                        token,
+                        clientId
+                );
+
+        Long lineId =
+                createQuoteLine(
+                        token,
+                        quoteId
+                );
+
+        QuoteLineRequest request =
+                new QuoteLineRequest(
+                        "Développement Spring Boot",
+                        3,
+                        BigDecimal.valueOf(500)
+                );
+
+        mockMvc.perform(
+                        put(
+                                "/api/quotes/"
+                                        + quoteId
+                                        + "/lines/"
+                                        + lineId
+                        )
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + token
+                                )
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        objectMapper.writeValueAsString(
+                                                request
+                                        )
+                                )
+                )
+                .andExpect(status().isOk());
     }
 
     @Test

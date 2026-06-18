@@ -278,6 +278,89 @@ class QuoteServiceImplTest {
     }
 
     @Test
+    void updateLineShouldUpdateLineAndRecalculateTotals() {
+
+        // Arrange
+        AppUser user = AppUser.builder()
+                .id(1L)
+                .build();
+
+        Client client = Client.builder()
+                .id(1L)
+                .user(user)
+                .build();
+
+        Quote quote = Quote.builder()
+                .id(1L)
+                .client(client)
+                .user(user)
+                .build();
+
+        QuoteLine line = QuoteLine.builder()
+                .id(1L)
+                .quote(quote)
+                .description("Ancienne prestation")
+                .quantity(2)
+                .unitPrice(BigDecimal.valueOf(100))
+                .build();
+
+        QuoteLineRequest request =
+                new QuoteLineRequest(
+                        "Nouvelle prestation",
+                        3,
+                        BigDecimal.valueOf(200)
+                );
+
+        when(quoteRepository.findById(1L))
+                .thenReturn(Optional.of(quote));
+
+        when(quoteLineRepository.findById(1L))
+                .thenReturn(Optional.of(line));
+
+        when(quoteLineRepository.findByQuote_Id(1L))
+                .thenReturn(List.of(line));
+
+        when(quoteRepository.save(any(Quote.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        QuoteResponse response =
+                quoteService.updateLine(
+                        1L,
+                        1L,
+                        request,
+                        user
+                );
+
+        // Assert
+        verify(quoteLineRepository)
+                .save(line);
+
+        verify(quoteRepository)
+                .save(quote);
+
+        assertAll(
+                () -> assertEquals(
+                        "Nouvelle prestation",
+                        line.getDescription()
+                ),
+                () -> assertEquals(
+                        3,
+                        line.getQuantity()
+                ),
+                () -> assertEquals(
+                        BigDecimal.valueOf(200),
+                        line.getUnitPrice()
+                ),
+                () -> assertEquals(
+                        0,
+                        response.totalHt()
+                                .compareTo(BigDecimal.valueOf(600))
+                )
+        );
+    }
+
+    @Test
     void deleteLineShouldDeleteLineAndRecalculateTotals() {
 
         // Arrange

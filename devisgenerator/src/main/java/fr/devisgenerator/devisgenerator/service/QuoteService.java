@@ -22,6 +22,8 @@ public interface QuoteService {
     // Gestion des lignes
     QuoteResponse addLine(Long quoteId, QuoteLineRequest request, AppUser user);
 
+    QuoteResponse updateLine(Long quoteId, Long lineId, QuoteLineRequest request, AppUser user);
+
     QuoteResponse deleteLine(Long quoteId, Long lineId, AppUser user);
 
 }
