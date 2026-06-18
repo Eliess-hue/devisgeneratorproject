@@ -1,6 +1,7 @@
 package fr.devisgenerator.devisgenerator.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import fr.devisgenerator.devisgenerator.enums.QuoteStatus;
@@ -40,6 +41,9 @@ public class Quote {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "valid_until", nullable = false)
+    private LocalDate validUntil;
+
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
@@ -50,9 +54,16 @@ public class Quote {
 
     @PrePersist
     public void prePersist() {
+
         if (this.createdAt == null) {
             this.createdAt = LocalDateTime.now();
         }
+
+        if (this.validUntil == null) {
+            this.validUntil =
+                    LocalDate.now().plusDays(30);
+        }
+
     }
 
 }

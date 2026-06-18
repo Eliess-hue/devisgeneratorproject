@@ -1,0 +1,6 @@
+ALTER TABLE quote
+    ADD COLUMN valid_until DATE NOT NULL
+        DEFAULT CURRENT_DATE + INTERVAL '30 days';
+
+ALTER TABLE quote
+    ALTER COLUMN valid_until DROP DEFAULT;
