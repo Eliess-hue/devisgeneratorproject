@@ -125,6 +125,29 @@ public class QuoteServiceImpl implements QuoteService {
 
     @Transactional
     @Override
+    public QuoteResponse updateLine(Long quoteId, Long lineId, QuoteLineRequest request, AppUser user) {
+
+        Quote quote = getOwnedQuote(quoteId, user);
+
+        QuoteLine line = getOwnedQuoteLine(
+                quote.getId(),
+                lineId
+        );
+
+        line.setDescription(request.description());
+        line.setQuantity(request.quantity());
+        line.setUnitPrice(request.unitPrice());
+
+        quoteLineRepository.save(line);
+
+        recalculateTotals(quote);
+
+        return toQuoteResponse(quote);
+
+    }
+
+    @Transactional
+    @Override
     public QuoteResponse deleteLine(Long quoteId, Long lineId, AppUser user) {
 
         Quote quote = getOwnedQuote(quoteId, user);
