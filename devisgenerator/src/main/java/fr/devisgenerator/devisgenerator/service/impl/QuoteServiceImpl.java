@@ -187,9 +187,10 @@ public class QuoteServiceImpl implements QuoteService {
                 quote.getTotalTva(),
                 quote.getTotalTtc(),
                 quote.getCreatedAt(),
+                quote.getValidUntil(),
                 toClientResponse(quote.getClient()),
                 toAppUserResponse(quote.getUser()),
-                lines  // ← ajouter
+                lines
         );
     }
 

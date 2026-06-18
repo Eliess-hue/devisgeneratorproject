@@ -3,6 +3,7 @@ package fr.devisgenerator.devisgenerator.dto.response;
 import fr.devisgenerator.devisgenerator.enums.QuoteStatus;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,6 +15,7 @@ public record QuoteResponse(
         BigDecimal totalTva,
         BigDecimal totalTtc,
         LocalDateTime createdAt,
+        LocalDate validUntil,
         ClientResponse client,
         AppUserResponse user,
         List<QuoteLineResponse> lines
