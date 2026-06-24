@@ -4,7 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import {
     getQuoteById,
     deleteQuoteLine,
-    addQuoteLine
+    addQuoteLine,
+    updateQuoteLine
 } from '../api/apiQuote'
 
 import QuoteLinesTable from '../components/quotelines/QuoteLinesTable.jsx'
@@ -35,6 +36,9 @@ export default function QuoteDetailPage() {
         useState(false)
 
     const [lineToDelete, setLineToDelete] =
+        useState(null)
+
+    const [editingLine, setEditingLine] =
         useState(null)
 
     const [lineForm, setLineForm] = useState({
@@ -83,6 +87,8 @@ export default function QuoteDetailPage() {
             unitPrice: ''
         })
 
+        setEditingLine(null)
+
         setLineError(null)
 
     }
@@ -118,14 +124,28 @@ export default function QuoteDetailPage() {
 
         try {
 
-            await addQuoteLine(id, {
-                description:
-                lineForm.description,
-                quantity:
-                    Number(lineForm.quantity),
-                unitPrice:
-                    Number(lineForm.unitPrice)
-            })
+            const payload = {
+                description: lineForm.description,
+                quantity: Number(lineForm.quantity),
+                unitPrice: Number(lineForm.unitPrice)
+            }
+
+            if (editingLine) {
+
+                await updateQuoteLine(
+                    id,
+                    editingLine.id,
+                    payload
+                )
+
+            } else {
+
+                await addQuoteLine(
+                    id,
+                    payload
+                )
+
+            }
 
             resetLineForm()
 
@@ -138,10 +158,28 @@ export default function QuoteDetailPage() {
             console.error(err)
 
             setLineError(
-                "Impossible d'ajouter la ligne"
+                editingLine
+                    ? "Impossible de modifier la ligne"
+                    : "Impossible d'ajouter la ligne"
             )
 
         }
+
+    }
+
+    const handleEditLine = (line) => {
+
+        setEditingLine(line)
+
+        setLineForm({
+            description: line.description,
+            quantity: String(line.quantity),
+            unitPrice: String(line.unitPrice)
+        })
+
+        setLineError(null)
+
+        setIsLineModalOpen(true)
 
     }
 
@@ -264,6 +302,7 @@ export default function QuoteDetailPage() {
                     setLineForm={setLineForm}
                     onAddLine={handleAddLine}
                     lineError={lineError}
+                    editingLine={editingLine}
                 />
 
             </QuoteLineModal>
@@ -279,9 +318,8 @@ export default function QuoteDetailPage() {
 
             <QuoteLinesTable
                 lines={quote.lines}
-                onDeleteLine={
-                    handleDeleteLine
-                }
+                onDeleteLine={handleDeleteLine}
+                onEditLine={handleEditLine}
             />
 
             <QuoteTotalsCard

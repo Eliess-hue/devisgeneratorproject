@@ -1,6 +1,7 @@
 export default function QuoteLinesTable({
                                             lines,
-                                            onDeleteLine
+                                            onDeleteLine,
+                                            onEditLine
                                         }) {
 
     return (
@@ -77,7 +78,26 @@ export default function QuoteLinesTable({
                                         ).toFixed(2)} €
                                     </td>
 
+
+
                                     <td>
+
+                                        <div className="flex gap-2">
+
+                                        <button
+                                            className="btn btn-xs
+                                            bg-blue-900
+                                            text-blue-400 border-none
+                                            hover:bg-blue-800 rounded-lg"
+
+                                            onClick={() =>
+                                                onEditLine(line)
+                                            }
+                                        >
+                                            Modifier
+                                        </button>
+
+                                        |
 
                                         <button
                                             className="
@@ -97,6 +117,8 @@ export default function QuoteLinesTable({
                                         >
                                             Supprimer
                                         </button>
+
+                                        </div>
 
                                     </td>
 
