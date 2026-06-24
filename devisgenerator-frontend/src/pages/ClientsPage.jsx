@@ -9,7 +9,8 @@ import {
 
 import ClientModal from '../components/clients/ClientModal.jsx'
 import ClientTable from '../components/clients/ClientTable.jsx'
-import ConfirmationModal from "../components/common/ConfirmationModal.jsx";
+import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
+import ClientsPageSkeleton from "../components/skeletons/ClientsPageSkeleton.jsx"
 
 export default function ClientsPage() {
 
@@ -40,7 +41,11 @@ export default function ClientsPage() {
                 .includes(search.toLowerCase())
     )
 
+    const [loading, setLoading] = useState(true)
+
     const loadClients = async () => {
+
+        setLoading(true)
 
         try {
 
@@ -58,6 +63,8 @@ export default function ClientsPage() {
                 'Impossible de charger les clients'
             )
 
+        } finally {
+            setLoading(false)
         }
 
     }
@@ -195,6 +202,10 @@ export default function ClientsPage() {
         fetchClients()
 
     }, [])
+
+    if (loading) {
+        return <ClientsPageSkeleton />
+    }
 
     return (
         <>

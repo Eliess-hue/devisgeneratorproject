@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 
 import { getDashboard } from '../api/apiDashboard.js'
-import DashboardStatsCards from "../components/dashboard/DashboardStatsCards.jsx";
-import DashboardRevenueChart from "../components/dashboard/DashboardRevenueChart.jsx";
-import DashboardRecentQuotesTable from "../components/dashboard/DashboardRecentQuotesTable.jsx";
+import DashboardStatsCards from "../components/dashboard/DashboardStatsCards.jsx"
+import DashboardRevenueChart from "../components/dashboard/DashboardRevenueChart.jsx"
+import DashboardRecentQuotesTable from "../components/dashboard/DashboardRecentQuotesTable.jsx"
+import DashboardPageSkeleton from "../components/skeletons/DashboardPageSkeleton.jsx"
 
 export default function DashboardPage() {
 
@@ -17,6 +18,8 @@ export default function DashboardPage() {
         useState(null)
 
     const loadDashboard = async () => {
+
+        setLoading(true)
 
         try {
 
@@ -52,7 +55,7 @@ export default function DashboardPage() {
     }, [])
 
     if (loading) {
-        return <p>Chargement...</p>
+        return <DashboardPageSkeleton/>
     }
 
     if (error) {
