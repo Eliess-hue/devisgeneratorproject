@@ -7,6 +7,7 @@ import {
     addQuoteLine,
     updateQuoteLine
 } from '../api/apiQuote'
+import {usePageTitle} from "../context/PageTitleContext.jsx"
 
 import QuoteLinesTable from '../components/quotelines/QuoteLinesTable.jsx'
 import QuoteTotalsCard from '../components/quotelines/QuoteTotalsCard.jsx'
@@ -22,6 +23,8 @@ export default function QuoteDetailPage() {
     const navigate = useNavigate()
 
     const { id } = useParams()
+
+    const { setPageTitle } = usePageTitle()
 
     const [quote, setQuote] = useState(null)
 
@@ -59,6 +62,10 @@ export default function QuoteDetailPage() {
 
             setQuote(
                 response.data
+            )
+
+            setPageTitle(
+                response.data.number
             )
 
             setError(null)
@@ -231,6 +238,14 @@ export default function QuoteDetailPage() {
         loadQuote()
 
     }, [id])
+
+    useEffect(() => {
+
+        return () => {
+            setPageTitle('DevisApp')
+        }
+
+    }, [])
 
     if (loading) {
         return <p>Chargement...</p>
