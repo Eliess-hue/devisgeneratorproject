@@ -2,8 +2,26 @@ export default function QuoteLineForm({
                                           lineForm,
                                           setLineForm,
                                           onAddLine,
-                                          lineError
+                                          lineError,
+                                          editingLine
                                       }) {
+
+    const quantity =
+        Number(lineForm.quantity) || 0;
+
+    const unitPrice =
+        Number(lineForm.unitPrice) || 0;
+
+    const totalHt =
+        quantity * unitPrice;
+
+    const totalTva =
+        totalHt * 0.20;
+
+    const totalTtc =
+        totalHt + totalTva;
+
+
 
     return (
 
@@ -12,9 +30,9 @@ export default function QuoteLineForm({
             <div className="card-body">
 
                 <h3 className="font-semibold text-lg">
-
-                    Ajouter une ligne
-
+                    {editingLine
+                        ? 'Modifier la ligne'
+                        : 'Ajouter une ligne'}
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -63,10 +81,40 @@ export default function QuoteLineForm({
                         className="btn btn-primary rounded-lg"
                         onClick={onAddLine}
                     >
-                        Ajouter
+                        {editingLine
+                            ? 'Modifier'
+                            : 'Ajouter'}
                     </button>
 
                 </div>
+
+                {totalHt > 0 && (
+
+                    <div className="mt-4 p-4 rounded-lg bg-base-100 border border-base-300">
+
+                        <h4 className="font-semibold mb-2">
+                            Aperçu
+                        </h4>
+
+                        <div className="space-y-1 text-sm">
+
+                            <p>
+                                HT : {totalHt.toFixed(2)} €
+                            </p>
+
+                            <p>
+                                TVA (20%) : {totalTva.toFixed(2)} €
+                            </p>
+
+                            <p className="font-semibold">
+                                TTC : {totalTtc.toFixed(2)} €
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                )}
 
                 {lineError && (
 

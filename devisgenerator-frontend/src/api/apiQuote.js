@@ -32,6 +32,16 @@ export const getQuoteLines = (quoteId) =>
 export const addQuoteLine = (quoteId, line) =>
     axiosConfig.post(`/api/quotes/${quoteId}/lines`, line)
 
+export const updateQuoteLine = (
+    quoteId,
+    lineId,
+    line
+) =>
+    axiosConfig.put(
+        `/api/quotes/${quoteId}/lines/${lineId}`,
+        line
+    )
+
 export const deleteQuoteLine = (
     quoteId,
     lineId
