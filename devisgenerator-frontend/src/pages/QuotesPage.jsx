@@ -1,15 +1,16 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect} from "react"
 import {
     getQuotes,
     createQuote,
     updateQuote,
     deleteQuote
-} from "../api/apiQuote.js";
+} from "../api/apiQuote.js"
 
-import {getClients} from "../api/apiClient.js";
-import QuoteModal from "../components/quotes/QuoteModal.jsx";
-import QuoteTable from "../components/quotes/QuoteTable.jsx";
-import ConfirmationModal from "../components/common/ConfirmationModal.jsx";
+import {getClients} from "../api/apiClient.js"
+import QuoteModal from "../components/quotes/QuoteModal.jsx"
+import QuoteTable from "../components/quotes/QuoteTable.jsx"
+import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
+import QuotesPageSkeleton from "../components/skeletons/QuotesPageSkeleton.jsx"
 
 export default function QuotesPage() {
 
@@ -33,6 +34,8 @@ export default function QuotesPage() {
 
     const [quoteToDelete, setQuoteToDelete] =
         useState(null)
+
+    const [loading, setLoading] = useState(true)
 
     const handleNewQuote = () => {
         if (clients.length === 0) {
@@ -67,6 +70,8 @@ export default function QuotesPage() {
 
     const loadQuotes = async () => {
 
+        setLoading(true)
+
         try {
 
             const response = await getQuotes()
@@ -82,6 +87,8 @@ export default function QuotesPage() {
                 "Impossible de charger les devis"
             )
 
+        } finally {
+            setLoading(false)
         }
 
     }
@@ -216,6 +223,10 @@ export default function QuotesPage() {
         fetchData()
 
     }, [])
+
+    if (loading) {
+        return <QuotesPageSkeleton />
+    }
 
     return (
         <>

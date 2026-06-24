@@ -16,7 +16,8 @@ import QuoteInfoCard from '../components/quotelines/QuoteInfoCard.jsx'
 import QuoteHeader from '../components/quotelines/QuoteHeader.jsx'
 import QuoteLineForm from '../components/quotelines/QuoteLineForm.jsx'
 import QuoteLineModal from '../components/quotelines/QuoteLineModal.jsx'
-import ConfirmationModal from "../components/common/ConfirmationModal.jsx";
+import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
+import QuoteDetailPageSkeleton from "../components/skeletons/QuoteDetailPageSkeleton.jsx"
 
 export default function QuoteDetailPage() {
 
@@ -53,7 +54,10 @@ export default function QuoteDetailPage() {
     const [lineError, setLineError] =
         useState(null)
 
+
     const loadQuote = async () => {
+
+        setLoading(true)
 
         try {
 
@@ -242,13 +246,13 @@ export default function QuoteDetailPage() {
     useEffect(() => {
 
         return () => {
-            setPageTitle('DevisApp')
+            setPageTitle(null)
         }
 
     }, [])
 
     if (loading) {
-        return <p>Chargement...</p>
+        return <QuoteDetailPageSkeleton/>
     }
 
     if (error) {
