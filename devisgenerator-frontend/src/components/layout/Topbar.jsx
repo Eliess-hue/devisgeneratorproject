@@ -1,10 +1,13 @@
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import {usePageTitle} from "../../context/PageTitleContext.jsx";
 
 export default function Topbar() {
 
     const location = useLocation()
     const { username } = useAuth()
+    const { pageTitle } = usePageTitle()
+
 
     const pageTitles = {
         '/dashboard': 'Tableau de bord',
@@ -13,7 +16,9 @@ export default function Topbar() {
     }
 
     const currentTitle =
-        pageTitles[location.pathname] || 'DevisApp'
+        pageTitle ||
+        pageTitles[location.pathname] ||
+        'DevisApp'
 
     return (
 
