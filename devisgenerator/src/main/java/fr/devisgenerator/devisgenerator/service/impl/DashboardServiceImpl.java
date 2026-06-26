@@ -53,6 +53,9 @@ public class DashboardServiceImpl implements DashboardService{
 
         BigDecimal totalRevenue =
                 quotes.stream()
+                        .filter(quote ->
+                                quote.getStatus() == QuoteStatus.ACCEPTED
+                        )
                         .map(Quote::getTotalTtc)
                         .filter(Objects::nonNull)
                         .reduce(
@@ -82,7 +85,10 @@ public class DashboardServiceImpl implements DashboardService{
 
         Map<YearMonth, BigDecimal> revenuesByMonth =
                 quotes.stream()
-                        .filter(q -> q.getTotalTtc() != null)
+                        .filter(quote ->
+                                quote.getStatus() == QuoteStatus.ACCEPTED
+                                        && quote.getTotalTtc() != null
+                        )
                         .collect(
                                 Collectors.groupingBy(
                                         quote ->
