@@ -19,6 +19,8 @@ public interface QuoteService {
 
     void delete(Long id, AppUser user);
 
+    QuoteResponse duplicate(Long id, AppUser user);
+
     // Gestion des lignes
     QuoteResponse addLine(Long quoteId, QuoteLineRequest request, AppUser user);
 

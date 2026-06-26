@@ -481,4 +481,114 @@ class QuoteServiceImplTest {
                 .save(any(Quote.class));
     }
 
+    @Test
+    void duplicateShouldCreateNewDraftQuoteWithDuplicatedLines() {
+
+        // Arrange
+        AppUser user = AppUser.builder()
+                .id(1L)
+                .build();
+
+        Client client = Client.builder()
+                .id(1L)
+                .name("ACME")
+                .user(user)
+                .build();
+
+        Quote originalQuote = Quote.builder()
+                .id(1L)
+                .number("DEV-2025-001")
+                .status(QuoteStatus.ACCEPTED)
+                .client(client)
+                .user(user)
+                .build();
+
+        Quote lastQuote = Quote.builder()
+                .id(10L)
+                .number("DEV-" + LocalDate.now().getYear() + "-001")
+                .build();
+
+        QuoteLine originalLine = QuoteLine.builder()
+                .id(1L)
+                .quote(originalQuote)
+                .description("Développement")
+                .quantity(2)
+                .unitPrice(BigDecimal.valueOf(100))
+                .build();
+
+        when(quoteRepository.findById(1L))
+                .thenReturn(Optional.of(originalQuote));
+
+        when(quoteRepository.findTopByOrderByIdDesc())
+                .thenReturn(Optional.of(lastQuote));
+
+        when(quoteRepository.save(any(Quote.class)))
+                .thenAnswer(invocation -> {
+                    Quote quote = invocation.getArgument(0);
+
+                    // Simule l'id généré par la BDD
+                    if (quote.getId() == null) {
+                        quote.setId(2L);
+                    }
+
+                    return quote;
+                });
+
+        when(quoteLineRepository.findByQuote_Id(1L))
+                .thenReturn(List.of(originalLine));
+
+        when(quoteLineRepository.saveAll(anyList()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        QuoteLine duplicatedLine = QuoteLine.builder()
+                .id(2L)
+                .description("Développement")
+                .quantity(2)
+                .unitPrice(BigDecimal.valueOf(100))
+                .build();
+
+        // utilisé dans recalculateTotals() puis dans toQuoteResponse()
+        when(quoteLineRepository.findByQuote_Id(2L))
+                .thenReturn(List.of(duplicatedLine));
+
+        // Act
+        QuoteResponse response =
+                quoteService.duplicate(1L, user);
+
+        // Assert
+
+        assertAll(
+                () -> assertEquals(
+                        QuoteStatus.DRAFT,
+                        response.status()
+                ),
+                () -> assertEquals(
+                        client.getId(),
+                        response.client().id()
+                ),
+                () -> assertEquals(
+                        1,
+                        response.lines().size()
+                ),
+                () -> assertEquals(
+                        "Développement",
+                        response.lines().getFirst().description()
+                ),
+                () -> assertEquals(
+                        2,
+                        response.lines().getFirst().quantity()
+                ),
+                () -> assertEquals(
+                        0,
+                        response.totalHt().compareTo(BigDecimal.valueOf(200))
+                )
+        );
+
+        verify(quoteRepository, times(2))
+                .save(any(Quote.class));
+
+        verify(quoteLineRepository)
+                .saveAll(anyList());
+    }
+
 }

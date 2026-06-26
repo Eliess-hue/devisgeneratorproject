@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -478,6 +478,47 @@ class QuoteControllerIntegrationTest {
                 .map(line -> line.getId())
                 .max(Long::compareTo)
                 .orElseThrow();
+    }
+
+    @Test
+    void duplicateQuoteShouldReturn201() throws Exception {
+
+        String token = getToken();
+
+        Long clientId =
+                createClient(
+                        token,
+                        validClientRequest()
+                );
+
+        Long quoteId =
+                createQuote(
+                        token,
+                        clientId
+                );
+
+        createQuoteLine(token, quoteId);
+
+        mockMvc.perform(
+                        post("/api/quotes/" + quoteId + "/duplicate")
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + token
+                                )
+                )
+                .andExpect(status().isCreated())
+
+                // Le nouveau devis est en brouillon
+                .andExpect(jsonPath("$.status").value("DRAFT"))
+
+                // Le client est conservé
+                .andExpect(jsonPath("$.client.id").value(clientId))
+
+                // Un nouveau numéro est généré
+                .andExpect(jsonPath("$.number").isNotEmpty())
+
+                // Les lignes ont bien été dupliquées
+                .andExpect(jsonPath("$.lines.length()").value(1));
     }
 
 }
