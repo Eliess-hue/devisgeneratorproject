@@ -82,13 +82,7 @@ public class QuoteServiceImpl implements QuoteService {
 
         Quote quote = getOwnedQuote(id, user);
 
-        Client client = getOwnedClient(
-                request.clientId(),
-                user
-        );
-
         quote.setStatus(request.status());
-        quote.setClient(client);
 
         quote = quoteRepository.save(quote);
 
