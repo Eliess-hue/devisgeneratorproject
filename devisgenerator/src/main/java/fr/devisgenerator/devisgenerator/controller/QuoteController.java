@@ -90,6 +90,20 @@ public class QuoteController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Dupliquer un devis",
+            description = "Duplique le devis sélectionné avec les informations d'origines"
+    )
+    @PostMapping("/{id}/duplicate")
+    public ResponseEntity<QuoteResponse> duplicate(
+            @PathVariable Long id,
+            @AuthenticationPrincipal AppUser user
+    ) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(quoteService.duplicate(id, user));
+    }
+
     // Partie Lines
 
     @Operation(

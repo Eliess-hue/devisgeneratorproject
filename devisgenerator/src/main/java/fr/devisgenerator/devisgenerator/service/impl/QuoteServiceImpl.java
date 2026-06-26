@@ -10,6 +10,7 @@ import fr.devisgenerator.devisgenerator.entity.AppUser;
 import fr.devisgenerator.devisgenerator.entity.Client;
 import fr.devisgenerator.devisgenerator.entity.Quote;
 import fr.devisgenerator.devisgenerator.entity.QuoteLine;
+import fr.devisgenerator.devisgenerator.enums.QuoteStatus;
 import fr.devisgenerator.devisgenerator.exception.ClientNotFoundException;
 import fr.devisgenerator.devisgenerator.exception.InvalidQuoteLineException;
 import fr.devisgenerator.devisgenerator.exception.QuoteLineNotFoundException;
@@ -96,6 +97,48 @@ public class QuoteServiceImpl implements QuoteService {
                 getOwnedQuote(id, user)
         );
     }
+
+    @Transactional
+    @Override
+    public QuoteResponse duplicate(Long id, AppUser user) {
+
+        Quote originalQuote = getOwnedQuote(id, user);
+
+        Quote newQuote = Quote.builder()
+                .number(generateQuoteNumber())
+                .status(QuoteStatus.DRAFT)
+                .client(originalQuote.getClient())
+                .user(user)
+                .totalHt(BigDecimal.ZERO)
+                .totalTva(BigDecimal.ZERO)
+                .totalTtc(BigDecimal.ZERO)
+                .build();
+
+        Quote duplicatedQuote = quoteRepository.save(newQuote);
+
+        List<QuoteLine> originalLines =
+                quoteLineRepository.findByQuote_Id(originalQuote.getId());
+
+        List<QuoteLine> duplicatedLines =
+                originalLines.stream()
+                        .map(line ->
+                                QuoteLine.builder()
+                                        .quote(duplicatedQuote)
+                                        .description(line.getDescription())
+                                        .quantity(line.getQuantity())
+                                        .unitPrice(line.getUnitPrice())
+                                        .build()
+                        )
+                        .toList();
+
+        quoteLineRepository.saveAll(duplicatedLines);
+
+        recalculateTotals(duplicatedQuote);
+
+        return toQuoteResponse(duplicatedQuote);
+    }
+
+    // Lines
 
     @Transactional
     @Override
