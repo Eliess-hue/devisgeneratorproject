@@ -20,7 +20,7 @@ export default function QuoteModal({
 
     const handleSave = () => {
 
-        if (!clientId) {
+        if (!editingQuote && !clientId) {
 
             setClientError(
                 'Veuillez sélectionner un client'
@@ -45,6 +45,7 @@ export default function QuoteModal({
     }
 
     return (
+
         <dialog className="modal modal-open">
 
             <div className="modal-box">
@@ -60,62 +61,70 @@ export default function QuoteModal({
 
                 <div className="flex flex-col gap-4">
 
-                    <select
-                        className="select select-bordered rounded-lg"
-                        value={clientId}
-                        onChange={(e) => {
+                    {!editingQuote && (
 
-                            const value = e.target.value
+                        <>
 
-                            setClientId(
-                                value ? Number(value) : ''
-                            )
+                            <select
+                                className="select select-bordered rounded-lg"
+                                value={clientId}
+                                onChange={(e) => {
 
-                            if (clientError) {
-                                setClientError('')
-                            }
+                                    const value = e.target.value
 
-                        }}
-                    >
+                                    setClientId(
+                                        value ? Number(value) : ''
+                                    )
 
-                        <option value="">
-                            Sélectionner un client
-                        </option>
+                                    if (clientError) {
+                                        setClientError('')
+                                    }
 
-                        {clients.map(client => (
-
-                            <option
-                                key={client.id}
-                                value={client.id}
+                                }}
                             >
-                                {client.name}
-                            </option>
 
-                        ))}
+                                <option value="">
+                                    Sélectionner un client
+                                </option>
 
-                    </select>
+                                {clients.map(client => (
 
-                    {clientError && (
+                                    <option
+                                        key={client.id}
+                                        value={client.id}
+                                    >
+                                        {client.name}
+                                    </option>
 
-                        <p
-                            className="text-sm"
-                            style={{
-                                color: '#FCA5A5'
-                            }}
-                        >
-                            {clientError}
-                        </p>
+                                ))}
 
-                    )}
+                            </select>
 
-                    {clients.length === 0 && (
+                            {clientError && (
 
-                        <p className="text-warning text-sm">
+                                <p
+                                    className="text-sm"
+                                    style={{
+                                        color: '#FCA5A5'
+                                    }}
+                                >
+                                    {clientError}
+                                </p>
 
-                            Aucun client disponible.
-                            Créez d'abord un client.
+                            )}
 
-                        </p>
+                            {clients.length === 0 && (
+
+                                <p className="text-warning text-sm">
+
+                                    Aucun client disponible.
+                                    Créez d'abord un client.
+
+                                </p>
+
+                            )}
+
+                        </>
 
                     )}
 
@@ -174,5 +183,6 @@ export default function QuoteModal({
             </div>
 
         </dialog>
+
     )
 }
