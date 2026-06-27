@@ -5,7 +5,8 @@ import {
     getQuoteById,
     deleteQuoteLine,
     addQuoteLine,
-    updateQuoteLine
+    updateQuoteLine,
+    duplicateQuote
 } from '../api/apiQuote'
 import {usePageTitle} from "../context/PageTitleContext.jsx"
 
@@ -237,6 +238,26 @@ export default function QuoteDetailPage() {
 
     }
 
+    const handleDuplicate = async () => {
+
+        try {
+
+            const response = await duplicateQuote(id)
+
+            navigate(`/quotes/${response.data.id}`)
+
+        } catch (err) {
+
+            console.error(err)
+
+            setError(
+                "Impossible de dupliquer le devis"
+            )
+
+        }
+
+    }
+
     useEffect(() => {
 
         loadQuote()
@@ -291,6 +312,7 @@ export default function QuoteDetailPage() {
                 onAddLine={() =>
                     setIsLineModalOpen(true)
                 }
+                onDuplicate={handleDuplicate}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

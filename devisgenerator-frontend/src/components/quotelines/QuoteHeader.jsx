@@ -2,7 +2,8 @@ import QuoteStatusBadge from './QuoteStatusBadge.jsx'
 
 export default function QuoteHeader({
                                         quote,
-                                        onAddLine
+                                        onAddLine,
+                                        onDuplicate
                                     }) {
 
     return (
@@ -44,6 +45,15 @@ export default function QuoteHeader({
                     "
                 >
                     PDF
+                </button>
+
+                <button
+                    className="btn
+                    bg-base-300 text-base-content
+                    border-none hover:bg-base-100 rounded-lg"
+                    onClick={onDuplicate}
+                >
+                    Dupliquer
                 </button>
 
             </div>

@@ -5,7 +5,8 @@ import {useNavigate} from "react-router-dom";
 export default function QuoteTable({
                                        quotes,
                                        onEdit,
-                                       onDelete
+                                       onDelete,
+                                       onDuplicate
                                    }) {
 
     const navigate = useNavigate();
@@ -115,6 +116,15 @@ export default function QuoteTable({
                                             }
                                         >
                                             Modifier
+                                        </button>
+
+                                        |
+
+                                        <button
+                                            className="btn btn-xs bg-base-300 text-base-content border-none hover:bg-base-100 rounded-lg"
+                                            onClick={() => onDuplicate(quote.id)}
+                                        >
+                                            Dupliquer
                                         </button>
 
                                         |

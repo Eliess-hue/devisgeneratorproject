@@ -25,6 +25,9 @@ export const updateQuote = (
 export const deleteQuote = (id) =>
     axiosConfig.delete(`/api/quotes/${id}`)
 
+export const duplicateQuote = (id) =>
+    axiosConfig.post(`/api/quotes/${id}/duplicate`)
+
 // QuoteLine
 export const getQuoteLines = (quoteId) =>
     axiosConfig.get(`/api/quotes/${quoteId}/lines`)

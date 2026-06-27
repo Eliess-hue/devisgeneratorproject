@@ -3,7 +3,8 @@ import {
     getQuotes,
     createQuote,
     updateQuote,
-    deleteQuote
+    deleteQuote,
+    duplicateQuote
 } from "../api/apiQuote.js"
 
 import {getClients} from "../api/apiClient.js"
@@ -211,6 +212,26 @@ export default function QuotesPage() {
 
     }
 
+    const handleDuplicateQuote = async (id) => {
+
+        try {
+
+            await duplicateQuote(id)
+
+            await loadQuotes()
+
+        } catch (err) {
+
+            console.error(err)
+
+            setError(
+                "Impossible de dupliquer le devis"
+            )
+
+        }
+
+    }
+
     useEffect(() => {
 
         const fetchData = async () => {
@@ -304,6 +325,7 @@ export default function QuotesPage() {
                     quotes={filteredQuotes}
                     onEdit={handleEditQuote}
                     onDelete={handleDeleteQuote}
+                    onDuplicate={handleDuplicateQuote}
                 />
 
             </div>
