@@ -28,6 +28,22 @@ export const deleteQuote = (id) =>
 export const duplicateQuote = (id) =>
     axiosConfig.post(`/api/quotes/${id}/duplicate`)
 
+export const searchQuotes = (filters) => {
+
+    const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(
+            ([, value]) =>
+                value !== null &&
+                value !== undefined &&
+                value !== ''
+        )
+    )
+
+    return axiosConfig.get('/api/quotes/search', {
+        params: cleanFilters
+    })
+}
+
 // QuoteLine
 export const getQuoteLines = (quoteId) =>
     axiosConfig.get(`/api/quotes/${quoteId}/lines`)

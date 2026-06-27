@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react"
 import {
-    getQuotes,
+    searchQuotes,
     createQuote,
     updateQuote,
     deleteQuote,
@@ -27,6 +27,10 @@ export default function QuotesPage() {
     const [status, setStatus] = useState('DRAFT')
 
     const [search, setSearch] = useState('')
+    const [isSearching, setIsSearching] = useState(false)
+    const [statusFilter, setStatusFilter] = useState('')
+    const [from, setFrom] = useState('')
+    const [to, setTo] = useState('')
 
     const [error, setError] = useState(null)
 
@@ -71,11 +75,18 @@ export default function QuotesPage() {
 
     const loadQuotes = async () => {
 
-        setLoading(true)
+        if (!loading) {
+            setIsSearching(true)
+        }
 
         try {
 
-            const response = await getQuotes()
+            const response = await searchQuotes({
+                search,
+                status: statusFilter,
+                from,
+                to
+            })
 
             setQuotes(response.data)
             setError(null)
@@ -84,14 +95,14 @@ export default function QuotesPage() {
 
             console.error(err)
 
-            setError(
-                "Impossible de charger les devis"
-            )
+            setError("Impossible de charger les devis")
 
         } finally {
-            setLoading(false)
-        }
 
+            setLoading(false)
+            setIsSearching(false)
+
+        }
     }
 
     const loadClients = async () => {
@@ -109,13 +120,6 @@ export default function QuotesPage() {
         }
 
     }
-
-    const filteredQuotes = quotes.filter(
-        quote =>
-            (quote.number || '')
-                .toLowerCase()
-                .includes(search.toLowerCase())
-    )
 
     const handleEditQuote = (quote) => {
 
@@ -233,15 +237,16 @@ export default function QuotesPage() {
     }
 
     useEffect(() => {
+        const timer = setTimeout(() => {
+            loadQuotes()
+        }, 300)
 
-        const fetchData = async () => {
+        return () => clearTimeout(timer)
+    }, [search, statusFilter, from, to])
 
-            await loadQuotes()
-            await loadClients()
+    useEffect(() => {
 
-        }
-
-        fetchData()
+        loadClients()
 
     }, [])
 
@@ -311,18 +316,47 @@ export default function QuotesPage() {
 
                 </div>
 
-                <input
-                    type="text"
-                    placeholder="🔍 Rechercher un devis..."
-                    className="input input-bordered w-full bg-base-200 border-base-300 rounded-lg"
-                    value={search}
-                    onChange={(e) =>
-                        setSearch(e.target.value)
-                    }
-                />
+                <div className="flex flex-wrap gap-4">
+
+                    <input
+                        type="text"
+                        placeholder="🔍 Rechercher un devis..."
+                        className="input input-bordered rounded-lg"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+
+                    <select
+                        className="select select-bordered rounded-lg"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                        <option value="">Tous les statuts</option>
+                        <option value="DRAFT">Brouillons</option>
+                        <option value="PENDING">En attentes</option>
+                        <option value="ACCEPTED">Acceptés</option>
+                        <option value="REFUSED">Refusés</option>
+                        <option value="EXPIRED">Expirés</option>
+                    </select>
+
+                    <input
+                        type="date"
+                        className="input input-bordered rounded-lg"
+                        value={from}
+                        onChange={(e) => setFrom(e.target.value)}
+                    />
+
+                    <input
+                        type="date"
+                        className="input input-bordered rounded-lg"
+                        value={to}
+                        onChange={(e) => setTo(e.target.value)}
+                    />
+
+                </div>
 
                 <QuoteTable
-                    quotes={filteredQuotes}
+                    quotes={quotes}
                     onEdit={handleEditQuote}
                     onDelete={handleDeleteQuote}
                     onDuplicate={handleDuplicateQuote}
