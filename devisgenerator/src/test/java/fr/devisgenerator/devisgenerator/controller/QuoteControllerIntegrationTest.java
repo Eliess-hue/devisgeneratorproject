@@ -521,4 +521,35 @@ class QuoteControllerIntegrationTest {
                 .andExpect(jsonPath("$.lines.length()").value(1));
     }
 
+    @Test
+    void searchQuotesShouldReturn200() throws Exception {
+
+        String token = getToken();
+
+        Long clientId =
+                createClient(
+                        token,
+                        validClientRequest()
+                );
+
+        createQuote(
+                token,
+                clientId
+        );
+
+        mockMvc.perform(
+                        get("/api/quotes/search")
+                                .param("status", "DRAFT")
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + token
+                                )
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].status").value("DRAFT"))
+                .andExpect(jsonPath("$[0].client.id").value(clientId))
+                .andExpect(jsonPath("$[0].number").exists());
+    }
+
 }

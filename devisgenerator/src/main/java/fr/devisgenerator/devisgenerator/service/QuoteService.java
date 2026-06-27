@@ -1,5 +1,6 @@
 package fr.devisgenerator.devisgenerator.service;
 
+import fr.devisgenerator.devisgenerator.dto.request.QuoteFilterRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteLineRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteRequest;
 import fr.devisgenerator.devisgenerator.dto.response.QuoteResponse;
@@ -20,6 +21,8 @@ public interface QuoteService {
     void delete(Long id, AppUser user);
 
     QuoteResponse duplicate(Long id, AppUser user);
+
+    List<QuoteResponse> search(QuoteFilterRequest filter, AppUser user);
 
     // Gestion des lignes
     QuoteResponse addLine(Long quoteId, QuoteLineRequest request, AppUser user);

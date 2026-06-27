@@ -12,12 +12,14 @@ import fr.devisgenerator.devisgenerator.exception.QuoteNotFoundException;
 import fr.devisgenerator.devisgenerator.repository.ClientRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteLineRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteRepository;
+import fr.devisgenerator.devisgenerator.dto.request.QuoteFilterRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -589,6 +591,66 @@ class QuoteServiceImplTest {
 
         verify(quoteLineRepository)
                 .saveAll(anyList());
+    }
+
+    @Test
+    void searchShouldReturnFilteredQuotes() {
+
+        // Arrange
+        AppUser user = AppUser.builder()
+                .id(1L)
+                .build();
+
+        Client client = Client.builder()
+                .id(1L)
+                .name("ACME")
+                .email("contact@acme.com")
+                .user(user)
+                .build();
+
+        Quote quote = Quote.builder()
+                .id(1L)
+                .number("DEV-2025-001")
+                .status(QuoteStatus.DRAFT)
+                .client(client)
+                .user(user)
+                .build();
+
+        QuoteFilterRequest filter =
+                new QuoteFilterRequest(
+                        "ACME",
+                        QuoteStatus.DRAFT,
+                        null,
+                        null
+                );
+
+        when(quoteRepository.findAll(any(Specification.class)))
+                .thenReturn(List.of(quote));
+
+        // Act
+        List<QuoteResponse> responses =
+                quoteService.search(filter, user);
+
+        // Assert
+        assertEquals(1, responses.size());
+
+        assertAll(
+                () -> assertEquals(
+                        "DEV-2025-001",
+                        responses.get(0).number()
+                ),
+                () -> assertEquals(
+                        QuoteStatus.DRAFT,
+                        responses.get(0).status()
+                ),
+                () -> assertEquals(
+                        "ACME",
+                        responses.get(0).client().name()
+                )
+        );
+
+        verify(quoteRepository)
+                .findAll(any(Specification.class));
     }
 
 }
