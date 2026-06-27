@@ -1,5 +1,6 @@
 package fr.devisgenerator.devisgenerator.controller;
 
+import fr.devisgenerator.devisgenerator.dto.request.QuoteFilterRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteLineRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteRequest;
 import fr.devisgenerator.devisgenerator.dto.response.QuoteResponse;
@@ -92,7 +93,7 @@ public class QuoteController {
 
     @Operation(
             summary = "Dupliquer un devis",
-            description = "Duplique le devis sélectionné avec les informations d'origines"
+            description = "Crée un nouveau devis en reprenant le client et les lignes du devis d'origine. Le nouveau devis est créé avec le statut DRAFT"
     )
     @PostMapping("/{id}/duplicate")
     public ResponseEntity<QuoteResponse> duplicate(
@@ -102,6 +103,18 @@ public class QuoteController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(quoteService.duplicate(id, user));
+    }
+
+    @Operation(
+            summary = "Filtrer les devis",
+            description = "Retourne les devis correspondant aux critères de recherche : texte, statut et période de création"
+    )
+    @GetMapping("/search")
+    public List<QuoteResponse> search(
+            @ModelAttribute QuoteFilterRequest filter,
+            @AuthenticationPrincipal AppUser user
+    ) {
+        return quoteService.search(filter, user);
     }
 
     // Partie Lines

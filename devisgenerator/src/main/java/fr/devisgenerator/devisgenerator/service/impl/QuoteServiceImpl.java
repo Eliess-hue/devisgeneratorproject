@@ -1,5 +1,6 @@
 package fr.devisgenerator.devisgenerator.service.impl;
 
+import fr.devisgenerator.devisgenerator.dto.request.QuoteFilterRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteLineRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteRequest;
 import fr.devisgenerator.devisgenerator.dto.response.AppUserResponse;
@@ -19,7 +20,9 @@ import fr.devisgenerator.devisgenerator.repository.ClientRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteLineRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteRepository;
 import fr.devisgenerator.devisgenerator.service.QuoteService;
+import fr.devisgenerator.devisgenerator.specification.QuoteSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,6 +139,26 @@ public class QuoteServiceImpl implements QuoteService {
         recalculateTotals(duplicatedQuote);
 
         return toQuoteResponse(duplicatedQuote);
+    }
+
+    @Override
+    public List<QuoteResponse> search(QuoteFilterRequest filter, AppUser user) {
+
+        Specification<Quote> spec = Specification.allOf(
+                QuoteSpecification.hasUser(user.getId()),
+                QuoteSpecification.hasSearch(filter.search()),
+                QuoteSpecification.hasStatus(filter.status()),
+                QuoteSpecification.isBetweenDates(
+                        filter.from(),
+                        filter.to()
+                )
+        );
+
+        return quoteRepository.findAll(spec)
+                .stream()
+                .map(this::toQuoteResponse)
+                .toList();
+
     }
 
     // Lines
