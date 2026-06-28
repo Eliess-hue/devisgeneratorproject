@@ -22,6 +22,8 @@ import fr.devisgenerator.devisgenerator.repository.QuoteRepository;
 import fr.devisgenerator.devisgenerator.service.QuoteService;
 import fr.devisgenerator.devisgenerator.specification.QuoteSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -142,7 +144,7 @@ public class QuoteServiceImpl implements QuoteService {
     }
 
     @Override
-    public List<QuoteResponse> search(QuoteFilterRequest filter, AppUser user) {
+    public Page<QuoteResponse> search(QuoteFilterRequest filter, Pageable pageable, AppUser user) {
 
         Specification<Quote> spec = Specification.allOf(
                 QuoteSpecification.hasUser(user.getId()),
@@ -154,10 +156,9 @@ public class QuoteServiceImpl implements QuoteService {
                 )
         );
 
-        return quoteRepository.findAll(spec)
-                .stream()
-                .map(this::toQuoteResponse)
-                .toList();
+        return quoteRepository
+                .findAll(spec, pageable)
+                .map(this::toQuoteResponse);
 
     }
 

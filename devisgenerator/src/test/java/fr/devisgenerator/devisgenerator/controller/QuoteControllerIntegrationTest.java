@@ -540,16 +540,22 @@ class QuoteControllerIntegrationTest {
         mockMvc.perform(
                         get("/api/quotes/search")
                                 .param("status", "DRAFT")
+                                .param("page", "0")
+                                .param("size", "10")
                                 .header(
                                         "Authorization",
                                         "Bearer " + token
                                 )
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].status").value("DRAFT"))
-                .andExpect(jsonPath("$[0].client.id").value(clientId))
-                .andExpect(jsonPath("$[0].number").exists());
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].status").value("DRAFT"))
+                .andExpect(jsonPath("$.content[0].client.id").value(clientId))
+                .andExpect(jsonPath("$.content[0].number").exists())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(10));
     }
 
 }

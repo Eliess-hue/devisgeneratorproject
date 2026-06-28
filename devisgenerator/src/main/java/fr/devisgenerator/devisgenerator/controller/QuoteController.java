@@ -3,11 +3,13 @@ package fr.devisgenerator.devisgenerator.controller;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteFilterRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteLineRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteRequest;
+import fr.devisgenerator.devisgenerator.dto.response.PageResponse;
 import fr.devisgenerator.devisgenerator.dto.response.QuoteResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
 import fr.devisgenerator.devisgenerator.service.QuoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -107,14 +109,18 @@ public class QuoteController {
 
     @Operation(
             summary = "Filtrer les devis",
-            description = "Retourne les devis correspondant aux critères de recherche : texte, statut et période de création"
+            description = "Retourne une page de devis correspondant aux critères de recherche : texte, statut et période de création."
     )
     @GetMapping("/search")
-    public List<QuoteResponse> search(
+    public PageResponse<QuoteResponse> search(
             @ModelAttribute QuoteFilterRequest filter,
+            Pageable pageable,
             @AuthenticationPrincipal AppUser user
     ) {
-        return quoteService.search(filter, user);
+
+        return PageResponse.from(
+                quoteService.search(filter, pageable, user)
+        );
     }
 
     // Partie Lines
