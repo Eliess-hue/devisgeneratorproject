@@ -18,6 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -624,33 +628,31 @@ class QuoteServiceImplTest {
                         null
                 );
 
-        when(quoteRepository.findAll(any(Specification.class)))
-                .thenReturn(List.of(quote));
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Quote> page =
+                new PageImpl<>(List.of(quote), pageable, 1);
+
+        when(quoteRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(page);
 
         // Act
-        List<QuoteResponse> responses =
-                quoteService.search(filter, user);
+        Page<QuoteResponse> responses =
+                quoteService.search(filter, pageable, user);
 
         // Assert
-        assertEquals(1, responses.size());
+        assertEquals(1, responses.getTotalElements());
+
+        QuoteResponse response = responses.getContent().getFirst();
 
         assertAll(
-                () -> assertEquals(
-                        "DEV-2025-001",
-                        responses.get(0).number()
-                ),
-                () -> assertEquals(
-                        QuoteStatus.DRAFT,
-                        responses.get(0).status()
-                ),
-                () -> assertEquals(
-                        "ACME",
-                        responses.get(0).client().name()
-                )
+                () -> assertEquals("DEV-2025-001", response.number()),
+                () -> assertEquals(QuoteStatus.DRAFT, response.status()),
+                () -> assertEquals("ACME", response.client().name())
         );
 
         verify(quoteRepository)
-                .findAll(any(Specification.class));
+                .findAll(any(Specification.class), any(Pageable.class));
     }
 
 }

@@ -5,6 +5,8 @@ import fr.devisgenerator.devisgenerator.dto.request.QuoteLineRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteRequest;
 import fr.devisgenerator.devisgenerator.dto.response.QuoteResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -22,7 +24,7 @@ public interface QuoteService {
 
     QuoteResponse duplicate(Long id, AppUser user);
 
-    List<QuoteResponse> search(QuoteFilterRequest filter, AppUser user);
+    Page<QuoteResponse> search(QuoteFilterRequest filter, Pageable pageable, AppUser user);
 
     // Gestion des lignes
     QuoteResponse addLine(Long quoteId, QuoteLineRequest request, AppUser user);
