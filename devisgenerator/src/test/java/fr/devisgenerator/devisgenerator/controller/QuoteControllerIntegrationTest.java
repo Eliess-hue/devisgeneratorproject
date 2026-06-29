@@ -162,7 +162,8 @@ class QuoteControllerIntegrationTest {
                 new QuoteLineRequest(
                         "Développement Docker",
                         2,
-                        BigDecimal.valueOf(450)
+                        BigDecimal.valueOf(450),
+                        BigDecimal.valueOf(0.20)
                 );
 
         mockMvc.perform(
@@ -209,7 +210,8 @@ class QuoteControllerIntegrationTest {
                 new QuoteLineRequest(
                         "Développement Spring Boot",
                         3,
-                        BigDecimal.valueOf(500)
+                        BigDecimal.valueOf(500),
+                        BigDecimal.valueOf(0.10)
                 );
 
         mockMvc.perform(
@@ -454,7 +456,8 @@ class QuoteControllerIntegrationTest {
                 new QuoteLineRequest(
                         "Développement Docker",
                         2,
-                        BigDecimal.valueOf(450)
+                        BigDecimal.valueOf(450),
+                        BigDecimal.valueOf(0.20)
                 );
 
         mockMvc.perform(
@@ -518,7 +521,13 @@ class QuoteControllerIntegrationTest {
                 .andExpect(jsonPath("$.number").isNotEmpty())
 
                 // Les lignes ont bien été dupliquées
-                .andExpect(jsonPath("$.lines.length()").value(1));
+                .andExpect(jsonPath("$.lines.length()").value(1))
+
+                // Lignes + tous les totaux
+                .andExpect(jsonPath("$.lines[0].vatRate").value(0.20))
+                .andExpect(jsonPath("$.totalHt").value(900))
+                .andExpect(jsonPath("$.totalTva").value(180.0))
+                .andExpect(jsonPath("$.totalTtc").value(1080.0));
     }
 
     @Test

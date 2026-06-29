@@ -7,6 +7,7 @@ public record QuoteLineResponse(
         String description,
         Integer quantity,
         BigDecimal unitPrice,
+        BigDecimal vatRate,
         BigDecimal total
 ) {
 }
