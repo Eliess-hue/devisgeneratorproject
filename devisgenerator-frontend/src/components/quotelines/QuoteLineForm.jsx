@@ -12,11 +12,14 @@ export default function QuoteLineForm({
     const unitPrice =
         Number(lineForm.unitPrice) || 0;
 
+    const vatRate =
+        Number(lineForm.vatRate);
+
     const totalHt =
         quantity * unitPrice;
 
     const totalTva =
-        totalHt * 0.20;
+        totalHt * vatRate;
 
     const totalTtc =
         totalHt + totalTva;
@@ -35,7 +38,7 @@ export default function QuoteLineForm({
                         : 'Ajouter une ligne'}
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
 
                     <input
                         type="text"
@@ -77,6 +80,22 @@ export default function QuoteLineForm({
                         }
                     />
 
+                    <select
+                        className="select select-bordered rounded-lg"
+                        value={lineForm.vatRate}
+                        onChange={(e) =>
+                            setLineForm({
+                                ...lineForm,
+                                vatRate: Number(e.target.value)
+                            })
+                        }
+                    >
+                        <option value={0}>0 %</option>
+                        <option value={0.055}>5.5 %</option>
+                        <option value={0.10}>10 %</option>
+                        <option value={0.20}>20 %</option>
+                    </select>
+
                     <button
                         className="btn btn-primary rounded-lg"
                         onClick={onAddLine}
@@ -103,7 +122,9 @@ export default function QuoteLineForm({
                             </p>
 
                             <p>
-                                TVA (20%) : {totalTva.toFixed(2)} €
+                                TVA ({(vatRate * 100).toFixed(1).replace(".0", "")} %) :
+                                {" "}
+                                {totalTva.toFixed(2)} €
                             </p>
 
                             <p className="font-semibold">

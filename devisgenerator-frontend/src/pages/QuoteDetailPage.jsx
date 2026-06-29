@@ -49,7 +49,8 @@ export default function QuoteDetailPage() {
     const [lineForm, setLineForm] = useState({
         description: '',
         quantity: '',
-        unitPrice: ''
+        unitPrice: '',
+        vatRate: '0.20'
     })
 
     const [lineError, setLineError] =
@@ -96,7 +97,8 @@ export default function QuoteDetailPage() {
         setLineForm({
             description: '',
             quantity: '',
-            unitPrice: ''
+            unitPrice: '',
+            vatRate: '0.20'
         })
 
         setEditingLine(null)
@@ -139,7 +141,8 @@ export default function QuoteDetailPage() {
             const payload = {
                 description: lineForm.description,
                 quantity: Number(lineForm.quantity),
-                unitPrice: Number(lineForm.unitPrice)
+                unitPrice: Number(lineForm.unitPrice),
+                vatRate: Number(lineForm.vatRate)
             }
 
             if (editingLine) {
@@ -186,7 +189,8 @@ export default function QuoteDetailPage() {
         setLineForm({
             description: line.description,
             quantity: String(line.quantity),
-            unitPrice: String(line.unitPrice)
+            unitPrice: String(line.unitPrice),
+            vatRate: String(line.vatRate)
         })
 
         setLineError(null)
