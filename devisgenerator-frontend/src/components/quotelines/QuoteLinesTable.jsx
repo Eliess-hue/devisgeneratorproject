@@ -4,6 +4,16 @@ export default function QuoteLinesTable({
                                             onEditLine
                                         }) {
 
+    const formatVatRate = (rate) => {
+
+        const percentage = rate * 100
+
+        return Number.isInteger(percentage)
+            ? `${percentage} %`
+            : `${percentage.toFixed(1)} %`
+
+    }
+
     return (
 
         <div className="card bg-base-200 border border-base-300 rounded-lg">
@@ -11,9 +21,7 @@ export default function QuoteLinesTable({
             <div className="card-body">
 
                 <h3 className="font-semibold text-lg">
-
                     Lignes du devis
-
                 </h3>
 
                 {lines.length === 0 ? (
@@ -21,9 +29,7 @@ export default function QuoteLinesTable({
                     <div className="py-8 text-center">
 
                         <p className="text-base-content/60">
-
                             Aucune ligne dans ce devis.
-
                         </p>
 
                     </div>
@@ -39,13 +45,10 @@ export default function QuoteLinesTable({
                             <tr>
 
                                 <th>Description</th>
-
                                 <th>Qté</th>
-
                                 <th>Prix unitaire</th>
-
+                                <th>TVA</th>
                                 <th>Total</th>
-
                                 <th>Actions</th>
 
                             </tr>
@@ -67,56 +70,36 @@ export default function QuoteLinesTable({
                                     </td>
 
                                     <td>
-                                        {Number(
-                                            line.unitPrice
-                                        ).toFixed(2)} €
+                                        {Number(line.unitPrice).toFixed(2)} €
                                     </td>
 
                                     <td>
-                                        {Number(
-                                            line.total
-                                        ).toFixed(2)} €
+                                        {formatVatRate(line.vatRate)}
                                     </td>
 
-
+                                    <td>
+                                        {Number(line.total).toFixed(2)} €
+                                    </td>
 
                                     <td>
 
                                         <div className="flex gap-2">
 
-                                        <button
-                                            className="btn btn-xs
-                                            bg-blue-900
-                                            text-blue-400 border-none
-                                            hover:bg-blue-800 rounded-lg"
+                                            <button
+                                                className="btn btn-xs bg-blue-900 text-blue-400 border-none hover:bg-blue-800 rounded-lg"
+                                                onClick={() => onEditLine(line)}
+                                            >
+                                                Modifier
+                                            </button>
 
-                                            onClick={() =>
-                                                onEditLine(line)
-                                            }
-                                        >
-                                            Modifier
-                                        </button>
+                                            |
 
-                                        |
-
-                                        <button
-                                            className="
-                                                btn
-                                                btn-xs
-                                                bg-red-950
-                                                text-red-300
-                                                border-none
-                                                hover:bg-red-900
-                                                rounded-lg
-                                            "
-                                            onClick={() =>
-                                                onDeleteLine(
-                                                    line.id
-                                                )
-                                            }
-                                        >
-                                            Supprimer
-                                        </button>
+                                            <button
+                                                className="btn btn-xs bg-red-950 text-red-300 border-none hover:bg-red-900 rounded-lg"
+                                                onClick={() => onDeleteLine(line.id)}
+                                            >
+                                                Supprimer
+                                            </button>
 
                                         </div>
 

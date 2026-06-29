@@ -1,0 +1,2 @@
+ALTER TABLE quote_line
+ALTER COLUMN vat_rate TYPE DECIMAL(5,3);

@@ -45,7 +45,7 @@ export default function QuoteTotalsCard({
                         <div className="flex justify-between">
 
                             <span>
-                                TVA (20%)
+                                TVA
                             </span>
 
                             <span>
