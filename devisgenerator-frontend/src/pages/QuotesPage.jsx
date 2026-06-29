@@ -12,6 +12,7 @@ import QuoteModal from "../components/quotes/QuoteModal.jsx"
 import QuoteTable from "../components/quotes/QuoteTable.jsx"
 import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
 import QuotesPageSkeleton from "../components/skeletons/QuotesPageSkeleton.jsx"
+import Pagination from "../components/common/Pagination.jsx";
 
 export default function QuotesPage() {
 
@@ -31,6 +32,10 @@ export default function QuotesPage() {
     const [statusFilter, setStatusFilter] = useState('')
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
+
+    const [page, setPage] = useState(0)
+    const [totalPages, setTotalPages] = useState(0)
+    const [totalElements, setTotalElements] = useState(0)
 
     const [error, setError] = useState(null)
 
@@ -85,10 +90,14 @@ export default function QuotesPage() {
                 search,
                 status: statusFilter,
                 from,
-                to
+                to,
+                page,
+                size: 10
             })
 
-            setQuotes(response.data)
+            setQuotes(response.data.content)
+            setTotalPages(response.data.totalPages)
+            setTotalElements(response.data.totalElements)
             setError(null)
 
         } catch (err) {
@@ -237,12 +246,16 @@ export default function QuotesPage() {
     }
 
     useEffect(() => {
+        setPage(0)
+    }, [search, statusFilter, from, to])
+
+    useEffect(() => {
         const timer = setTimeout(() => {
             loadQuotes()
         }, 300)
 
         return () => clearTimeout(timer)
-    }, [search, statusFilter, from, to])
+    }, [search, statusFilter, from, to, page])
 
     useEffect(() => {
 
@@ -360,6 +373,13 @@ export default function QuotesPage() {
                     onEdit={handleEditQuote}
                     onDelete={handleDeleteQuote}
                     onDuplicate={handleDuplicateQuote}
+                />
+
+                <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    onPageChange={setPage}
                 />
 
             </div>
