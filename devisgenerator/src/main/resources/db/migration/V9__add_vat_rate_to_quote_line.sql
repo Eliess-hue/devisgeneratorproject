@@ -1,0 +1,5 @@
+ALTER TABLE quote_line
+    ADD COLUMN vat_rate DECIMAL(5,2) NOT NULL DEFAULT 0.20;
+
+ALTER TABLE quote_line
+    ALTER COLUMN vat_rate DROP DEFAULT;

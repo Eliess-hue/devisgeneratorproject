@@ -250,7 +250,8 @@ class QuoteServiceImplTest {
                 new QuoteLineRequest(
                         "Développement",
                         2,
-                        BigDecimal.valueOf(100)
+                        BigDecimal.valueOf(100),
+                        BigDecimal.valueOf(0.20)
                 );
 
         QuoteLine line = QuoteLine.builder()
@@ -258,6 +259,7 @@ class QuoteServiceImplTest {
                 .description("Développement")
                 .quantity(2)
                 .unitPrice(BigDecimal.valueOf(100))
+                .vatRate(BigDecimal.valueOf(0.20))
                 .build();
 
         when(quoteRepository.findById(1L))
@@ -308,13 +310,15 @@ class QuoteServiceImplTest {
                 .description("Ancienne prestation")
                 .quantity(2)
                 .unitPrice(BigDecimal.valueOf(100))
+                .vatRate(BigDecimal.valueOf(0.20))
                 .build();
 
         QuoteLineRequest request =
                 new QuoteLineRequest(
                         "Nouvelle prestation",
                         3,
-                        BigDecimal.valueOf(200)
+                        BigDecimal.valueOf(200),
+                        BigDecimal.valueOf(0.10)
                 );
 
         when(quoteRepository.findById(1L))
@@ -391,6 +395,7 @@ class QuoteServiceImplTest {
                 .description("Développement")
                 .quantity(2)
                 .unitPrice(BigDecimal.valueOf(100))
+                .vatRate(BigDecimal.valueOf(0.20))
                 .build();
 
         when(quoteRepository.findById(1L))
@@ -520,6 +525,7 @@ class QuoteServiceImplTest {
                 .description("Développement")
                 .quantity(2)
                 .unitPrice(BigDecimal.valueOf(100))
+                .vatRate(BigDecimal.valueOf(0.20))
                 .build();
 
         when(quoteRepository.findById(1L))
@@ -551,6 +557,7 @@ class QuoteServiceImplTest {
                 .description("Développement")
                 .quantity(2)
                 .unitPrice(BigDecimal.valueOf(100))
+                .vatRate(BigDecimal.valueOf(0.20))
                 .build();
 
         // utilisé dans recalculateTotals() puis dans toQuoteResponse()
@@ -587,6 +594,18 @@ class QuoteServiceImplTest {
                 () -> assertEquals(
                         0,
                         response.totalHt().compareTo(BigDecimal.valueOf(200))
+                ),
+                () -> assertEquals(
+                        0,
+                        response.totalTva().compareTo(BigDecimal.valueOf(40))
+                ),
+                () -> assertEquals(
+                        0,
+                        response.totalTtc().compareTo(BigDecimal.valueOf(240))
+                ),
+                () -> assertEquals(
+                        BigDecimal.valueOf(0.20),
+                        response.lines().getFirst().vatRate()
                 )
         );
 

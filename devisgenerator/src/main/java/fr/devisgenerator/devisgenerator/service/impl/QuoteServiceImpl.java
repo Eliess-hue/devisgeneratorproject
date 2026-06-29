@@ -132,6 +132,7 @@ public class QuoteServiceImpl implements QuoteService {
                                         .description(line.getDescription())
                                         .quantity(line.getQuantity())
                                         .unitPrice(line.getUnitPrice())
+                                        .vatRate(line.getVatRate())
                                         .build()
                         )
                         .toList();
@@ -175,6 +176,7 @@ public class QuoteServiceImpl implements QuoteService {
                 .description(request.description())
                 .quantity(request.quantity())
                 .unitPrice(request.unitPrice())
+                .vatRate(request.vatRate())
                 .build();
 
         quoteLineRepository.save(line);
@@ -198,6 +200,7 @@ public class QuoteServiceImpl implements QuoteService {
         line.setDescription(request.description());
         line.setQuantity(request.quantity());
         line.setUnitPrice(request.unitPrice());
+        line.setVatRate(request.vatRate());
 
         quoteLineRepository.save(line);
 
@@ -257,6 +260,7 @@ public class QuoteServiceImpl implements QuoteService {
                         line.getDescription(),
                         line.getQuantity(),
                         line.getUnitPrice(),
+                        line.getVatRate(),
                         line.getUnitPrice().multiply(
                                 BigDecimal.valueOf(line.getQuantity())
                         )
@@ -360,26 +364,25 @@ public class QuoteServiceImpl implements QuoteService {
                         quote.getId()
                 );
 
-        BigDecimal totalHt = lines.stream()
-                .map(line ->
-                        line.getUnitPrice().multiply(
-                                BigDecimal.valueOf(
-                                        line.getQuantity()
-                                )
-                        )
-                )
-                .reduce(
-                        BigDecimal.ZERO,
-                        BigDecimal::add
-                );
+        BigDecimal totalHt = BigDecimal.ZERO;
+        BigDecimal totalTva = BigDecimal.ZERO;
 
-        BigDecimal totalTva =
-                totalHt.multiply(
-                        BigDecimal.valueOf(0.20)
-                );
+        for (QuoteLine line : lines) {
 
-        BigDecimal totalTtc =
-                totalHt.add(totalTva);
+            BigDecimal lineTotalHt =
+                    line.getUnitPrice()
+                            .multiply(BigDecimal.valueOf(line.getQuantity()));
+
+            BigDecimal lineTva =
+                    lineTotalHt.multiply(
+                            line.getVatRate()
+                    );
+
+            totalHt = totalHt.add(lineTotalHt);
+            totalTva = totalTva.add(lineTva);
+        }
+
+        BigDecimal totalTtc = totalHt.add(totalTva);
 
         quote.setTotalHt(totalHt);
         quote.setTotalTva(totalTva);
