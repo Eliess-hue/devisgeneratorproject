@@ -1,40 +1,55 @@
-export default function QuoteStatusBadge({
-                                             status
-                                         }) {
+export default function QuoteStatusBadge({ status }) {
 
-    const styles = {
+    const classes = {
+
         DRAFT:
-            'badge px-3 py-3 bg-slate-700 text-slate-200 border-none rounded-lg',
+            "badge px-3 py-3 rounded-lg border-none " +
+            "bg-[var(--color-status-draft-bg)] " +
+            "text-[var(--color-status-draft-text)]",
 
         PENDING:
-            'badge px-3 py-3 bg-[#0B2E5B] text-[#4EA1FF] border-none rounded-lg',
+            "badge px-3 py-3 rounded-lg border-none " +
+            "bg-[var(--color-status-pending-bg)] " +
+            "text-[var(--color-status-pending-text)]",
 
         ACCEPTED:
-            'badge px-3 py-3 bg-[#064E3B] text-[#34D399] border-none rounded-lg',
+            "badge px-3 py-3 rounded-lg border-none " +
+            "bg-[var(--color-status-accepted-bg)] " +
+            "text-[var(--color-status-accepted-text)]",
 
         REFUSED:
-            'badge px-3 py-3 bg-[#7F1D1D] text-[#FCA5A5] border-none rounded-lg',
+            "badge px-3 py-3 rounded-lg border-none " +
+            "bg-[var(--color-status-refused-bg)] " +
+            "text-[var(--color-status-refused-text)]",
 
         EXPIRED:
-            'badge px-3 py-3 bg-[#78350F] text-[#FCD34D] border-none rounded-lg'
+            "badge px-3 py-3 rounded-lg border-none " +
+            "bg-[var(--color-status-expired-bg)] " +
+            "text-[var(--color-status-expired-text)]"
+
     }
 
     const labels = {
-        DRAFT: 'Brouillon',
-        PENDING: 'En attente',
-        ACCEPTED: 'Accepté',
-        REFUSED: 'Refusé',
-        EXPIRED: 'Expiré'
+
+        DRAFT: "Brouillon",
+        PENDING: "En attente",
+        ACCEPTED: "Accepté",
+        REFUSED: "Refusé",
+        EXPIRED: "Expiré"
+
     }
 
     return (
+
         <span
             className={
-                styles[status] ||
-                'badge bg-slate-700 text-slate-200 border-none rounded-lg'
+                classes[status] ||
+                "badge px-3 py-3 rounded-lg border-none"
             }
         >
             {labels[status] || status}
         </span>
+
     )
+
 }

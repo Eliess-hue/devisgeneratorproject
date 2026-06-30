@@ -26,8 +26,15 @@ export default function UserProfile() {
             </div>
             <button
                 onClick={handleLogout}
-                className="btn btn-xs btn-ghost text-error hover:bg-error/10 rounded-lg"
-                style={{backgroundColor: '#450A0A'}}
+                className="
+                    btn
+                    btn-xs
+                    btn-ghost
+                    bg-[var(--color-error-bg)]
+                    text-[var(--color-error-text)]
+                    hover:bg-error/10
+                    rounded-lg
+                "
                 title="Se déconnecter"
             >
                 ⏻

@@ -103,10 +103,7 @@ export default function QuoteModal({
                             {clientError && (
 
                                 <p
-                                    className="text-sm"
-                                    style={{
-                                        color: '#FCA5A5'
-                                    }}
+                                    className="text-sm text-[var(--color-error-text)]"
                                 >
                                     {clientError}
                                 </p>

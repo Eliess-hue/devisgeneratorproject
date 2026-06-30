@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { register } from '../api/apiAuth.js'
+import Alert from "../components/common/Alert.jsx"
 
 export default function RegisterPage() {
 
@@ -109,16 +110,12 @@ export default function RegisterPage() {
                 </p>
 
                 {error && (
-                    <div
-                        className="mb-4 rounded-lg border px-4 py-3"
-                        style={{
-                            backgroundColor: '#450A0A',
-                            borderColor: '#7F1D1D',
-                            color: '#FCA5A5'
-                        }}
+                    <Alert
+                        type="error"
+                        className="mb-4"
                     >
-                        <span>{error}</span>
-                    </div>
+                        {error}
+                    </Alert>
                 )}
 
                 <form
@@ -144,10 +141,7 @@ export default function RegisterPage() {
 
                         {usernameError && (
                             <p
-                                className="mt-1 text-sm"
-                                style={{
-                                    color: '#FCA5A5'
-                                }}
+                                className="mt-1 text-sm text-[var(--color-error-text)]"
                             >
                                 {usernameError}
                             </p>
@@ -172,10 +166,7 @@ export default function RegisterPage() {
 
                         {passwordError && (
                             <p
-                                className="mt-1 text-sm"
-                                style={{
-                                    color: '#FCA5A5'
-                                }}
+                                className="mt-1 text-sm text-[var(--color-error-text)]"
                             >
                                 {passwordError}
                             </p>

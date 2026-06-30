@@ -4,14 +4,57 @@
 }
 
 @theme {
+
+    /* Base */
+
     --color-base-100: #0A0A0A;
     --color-base-200: #111111;
-    --color-base-300: #1a1a1a;
+    --color-base-300: #1A1A1A;
     --color-base-content: #F9FAFB;
+
+    /* Primary */
+
     --color-primary: #3B82F6;
-    --color-primary-content: #ffffff;
+    --color-primary-content: #FFFFFF;
+
+    /* Neutral */
+
     --color-neutral: #2E2E2E;
     --color-neutral-content: #F9FAFB;
+
+    /* Error */
+
+    --color-error-bg: #450A0A;
+    --color-error-border: #7F1D1D;
+    --color-error-text: #FCA5A5;
+
+    /* Success */
+
+    --color-success-bg: #052E16;
+    --color-success-border: #166534;
+    --color-success-text: #86EFAC;
+
+    /* Quote status */
+
+    --color-status-draft-bg: #334155;
+    --color-status-draft-text: #E2E8F0;
+
+    --color-status-accepted-bg: #064E3B;
+    --color-status-accepted-text: #34D399;
+
+    --color-status-refused-bg: #7F1D1D;
+    --color-status-refused-text: #FCA5A5;
+
+    --color-status-pending-bg: #0B2E5B;
+    --color-status-pending-text: #4EA1FF;
+
+    --color-status-expired-bg: #78350F;
+    --color-status-expired-text: #FCD34D;
+
+    /* Charts */
+
+    --color-chart-primary: #4EA1FF;
+
 }
 
 * {

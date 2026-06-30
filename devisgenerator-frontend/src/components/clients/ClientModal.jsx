@@ -124,10 +124,7 @@ export default function ClientModal({
                     />
                     {nameError && (
                         <p
-                            className="mt-1 text-sm"
-                            style={{
-                                color: '#FCA5A5'
-                            }}
+                            className="mt-1 text-sm text-[var(--color-error-text)]"
                         >
                             {nameError}
                         </p>
@@ -150,10 +147,7 @@ export default function ClientModal({
                     />
                     {emailError && (
                         <p
-                            className="mt-1 text-sm"
-                            style={{
-                                color: '#FCA5A5'
-                            }}
+                            className="mt-1 text-sm text-[var(--color-error-text)]"
                         >
                             {emailError}
                         </p>
@@ -176,10 +170,7 @@ export default function ClientModal({
                     />
                     {phoneError && (
                         <p
-                            className="mt-1 text-sm"
-                            style={{
-                                color: '#FCA5A5'
-                            }}
+                            className="mt-1 text-sm text-[var(--color-error-text)]"
                         >
                             {phoneError}
                         </p>
@@ -202,10 +193,7 @@ export default function ClientModal({
                     />
                     {addressError && (
                         <p
-                            className="mt-1 text-sm"
-                            style={{
-                                color: '#FCA5A5'
-                            }}
+                            className="mt-1 text-sm text-[var(--color-error-text)]"
                         >
                             {addressError}
                         </p>
