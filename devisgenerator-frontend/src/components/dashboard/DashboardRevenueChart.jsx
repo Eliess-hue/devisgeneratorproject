@@ -31,7 +31,7 @@ export default function DashboardRevenueChart({ monthlyRevenues }) {
 
                         <Bar
                             dataKey="revenue"
-                            fill="#4EA1FF"
+                            fill="var(--color-chart-primary)"
                             radius={[8, 8, 0, 0]}
                         />
                     </BarChart>

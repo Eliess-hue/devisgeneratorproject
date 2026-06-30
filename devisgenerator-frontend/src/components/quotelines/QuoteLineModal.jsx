@@ -38,8 +38,15 @@ export default function QuoteLineModal({
 
                     <button
                         onClick={onClose}
-                        className="btn btn-xs btn-ghost text-error hover:bg-error/10 rounded-lg"
-                        style={{backgroundColor: '#450A0A'}}
+                        className="
+                            btn
+                            btn-xs
+                            btn-ghost
+                            rounded-lg
+                            bg-[var(--color-error-bg)]
+                            text-[var(--color-error-text)]
+                            hover:bg-error/10
+                        "
                     >
                         ✕
                     </button>

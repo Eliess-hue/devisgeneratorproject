@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { login } from '../api/apiAuth.js'
+import Alert from "../components/common/Alert.jsx"
 
 export default function LoginPage() {
     const { saveAuth } = useAuth()
@@ -131,29 +132,21 @@ export default function LoginPage() {
                 </p>
 
                 {successMessage && (
-                    <div
-                        className="mb-4 rounded-lg border px-4 py-3"
-                        style={{
-                            background: '#052E16',
-                            border: '1px solid #166534',
-                            color: '#86EFAC'
-                        }}
+                    <Alert
+                        type="success"
+                        className="mb-4"
                     >
-                        <span>{successMessage}</span>
-                    </div>
+                        {successMessage}
+                    </Alert>
                 )}
 
                 {error && (
-                    <div
-                        className="mb-4 rounded-lg border px-4 py-3"
-                        style={{
-                            backgroundColor: '#450A0A',
-                            borderColor: '#7F1D1D',
-                            color: '#FCA5A5'
-                        }}
+                    <Alert
+                        type="error"
+                        className="mb-4"
                     >
-                        <span>{error}</span>
-                    </div>
+                        {error}
+                    </Alert>
                 )}
 
                 <form
@@ -182,10 +175,7 @@ export default function LoginPage() {
 
                     {usernameError && (
                         <p
-                            className="mt-1 text-sm"
-                            style={{
-                                color: '#FCA5A5'
-                            }}
+                            className="mt-1 text-sm text-[var(--color-error-text)]"
                         >
                             {usernameError}
                         </p>
@@ -214,10 +204,7 @@ export default function LoginPage() {
 
                     {passwordError && (
                         <p
-                            className="mt-1 text-sm"
-                            style={{
-                                color: '#FCA5A5'
-                            }}
+                            className="mt-1 text-sm text-[var(--color-error-text)]"
                         >
                             {passwordError}
                         </p>

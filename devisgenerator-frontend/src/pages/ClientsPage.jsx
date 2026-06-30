@@ -11,6 +11,7 @@ import ClientModal from '../components/clients/ClientModal.jsx'
 import ClientTable from '../components/clients/ClientTable.jsx'
 import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
 import ClientsPageSkeleton from "../components/skeletons/ClientsPageSkeleton.jsx"
+import Alert from "../components/common/Alert.jsx"
 
 export default function ClientsPage() {
 
@@ -237,16 +238,12 @@ export default function ClientsPage() {
             <div className="space-y-6">
 
                 {error && (
-                    <div
-                        className="mb-4 rounded-lg border px-4 py-3"
-                        style={{
-                            backgroundColor: '#450A0A',
-                            borderColor: '#7F1D1D',
-                            color: '#FCA5A5'
-                        }}
+                    <Alert
+                        type="error"
+                        className="mb-4"
                     >
-                        <span>{error}</span>
-                    </div>
+                        {error}
+                    </Alert>
                 )}
 
                 <div className="flex items-center justify-between">

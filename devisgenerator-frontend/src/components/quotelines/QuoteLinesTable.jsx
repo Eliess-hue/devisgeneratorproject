@@ -48,7 +48,7 @@ export default function QuoteLinesTable({
                                 <th>Qté</th>
                                 <th>Prix unitaire</th>
                                 <th>TVA</th>
-                                <th>Total</th>
+                                <th>Total HT</th>
                                 <th>Actions</th>
 
                             </tr>

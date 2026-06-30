@@ -12,7 +12,8 @@ import QuoteModal from "../components/quotes/QuoteModal.jsx"
 import QuoteTable from "../components/quotes/QuoteTable.jsx"
 import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
 import QuotesPageSkeleton from "../components/skeletons/QuotesPageSkeleton.jsx"
-import Pagination from "../components/common/Pagination.jsx";
+import Pagination from "../components/common/Pagination.jsx"
+import Alert from "../components/common/Alert.jsx"
 
 export default function QuotesPage() {
 
@@ -294,16 +295,12 @@ export default function QuotesPage() {
             <div className="space-y-6">
 
                 {error && (
-                    <div
-                        className="mb-4 rounded-lg border px-4 py-3"
-                        style={{
-                            backgroundColor: '#450A0A',
-                            borderColor: '#7F1D1D',
-                            color: '#FCA5A5'
-                        }}
+                    <Alert
+                        type="error"
+                        className="mb-4"
                     >
-                        <span>{error}</span>
-                    </div>
+                        {error}
+                    </Alert>
                 )}
 
                 <div className="flex items-center justify-between">

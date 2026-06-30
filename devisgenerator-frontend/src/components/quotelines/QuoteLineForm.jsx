@@ -1,3 +1,5 @@
+import Alert from "../common/Alert.jsx"
+
 export default function QuoteLineForm({
                                           lineForm,
                                           setLineForm,
@@ -139,19 +141,12 @@ export default function QuoteLineForm({
 
                 {lineError && (
 
-                    <div className="mb-4 mt-3 rounded-lg border px-4 py-3"
-                         style={{
-                             backgroundColor: '#450A0A',
-                             borderColor: '#7F1D1D',
-                             color: '#FCA5A5'
-                         }}
+                    <Alert
+                        type="error"
+                        className="mb-4"
                     >
-
-                        <span>
-                            {lineError}
-                        </span>
-
-                    </div>
+                        {lineError}
+                    </Alert>
 
                 )}
 

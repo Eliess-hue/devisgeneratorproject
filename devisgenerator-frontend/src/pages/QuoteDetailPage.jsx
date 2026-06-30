@@ -296,13 +296,12 @@ export default function QuoteDetailPage() {
                         py-2
                         rounded-lg
                         border
-                        border-[#2E2E2E]
+                        border-[var(--color-neutral)]
                         bg-transparent
-                        text-white
-                        hover:bg-[#111111]
+                        text-base-content/70
+                        hover:bg-[var(--color-base-200)]
                         transition
                         text-sm
-                      text-base-content/70
                     "
                     onClick={() => navigate('/quotes')}
                 >
