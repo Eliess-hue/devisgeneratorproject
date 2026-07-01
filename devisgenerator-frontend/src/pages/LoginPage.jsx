@@ -21,8 +21,6 @@ export default function LoginPage() {
         location.state?.message || null
     )
 
-    //const response = await login(username, password)
-
     useEffect(() => {
 
         if (successMessage) {
