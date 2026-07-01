@@ -1,11 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-import {
-    getClients,
-    createClient,
-    updateClient,
-    deleteClient
-} from '../api/apiClient.js'
+import useClients from "../hooks/useClients.js";
 
 import ClientModal from '../components/clients/ClientModal.jsx'
 import ClientTable from '../components/clients/ClientTable.jsx'
@@ -16,24 +11,26 @@ import Alert from "../components/common/Alert.jsx"
 export default function ClientsPage() {
 
 
-    const [clients, setClients] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false)
-
     const [editingClient, setEditingClient] = useState(null)
-
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
     const [address, setAddress] = useState('')
-
     const [search, setSearch] = useState('')
-    const [error, setError] = useState(null)
-
     const [isDeleteModalOpen, setIsDeleteModalOpen] =
          useState(false)
-
     const [clientToDelete, setClientToDelete] =
          useState(null)
+
+    const {
+        clients,
+        loading,
+        error,
+        clearError,
+        saveClient,
+        removeClient
+    } = useClients();
 
     const filteredClients = clients.filter(
         client =>
@@ -42,33 +39,6 @@ export default function ClientsPage() {
                 .includes(search.toLowerCase())
     )
 
-    const [loading, setLoading] = useState(true)
-
-    const loadClients = async () => {
-
-        setLoading(true)
-
-        try {
-
-            const response = await getClients()
-
-            setClients(response.data)
-            setError(null)
-
-        } catch (err) {
-
-            console.error(err)
-
-            setError(
-                err.response?.data ||
-                'Impossible de charger les clients'
-            )
-
-        } finally {
-            setLoading(false)
-        }
-
-    }
 
     const handleNewClient = () => {
 
@@ -100,40 +70,21 @@ export default function ClientsPage() {
 
         try {
 
-            if (editingClient) {
+            await saveClient({
 
-                await updateClient(
-                    editingClient.id,
-                    name,
-                    email,
-                    phone,
-                    address
-                )
+                id: editingClient?.id,
+                name,
+                email,
+                phone,
+                address
 
-            } else {
+            });
 
-                await createClient(
-                    name,
-                    email,
-                    phone,
-                    address
-                )
-
-            }
-
-            await loadClients()
-            setError(null)
-
-            closeModal()
+            closeModal();
 
         } catch (err) {
 
             console.error(err)
-
-            setError(
-                err.response?.data ||
-                'Impossible d’enregistrer le client'
-            )
 
         }
 
@@ -151,23 +102,13 @@ export default function ClientsPage() {
 
         try {
 
-            await deleteClient(
-                clientToDelete
-            )
+            await removeClient(clientToDelete);
 
-            await loadClients()
-
-            setIsDeleteModalOpen(false)
-
-            setClientToDelete(null)
+            closeDeleteModal();
 
         } catch (err) {
 
             console.error(err)
-
-            setError(
-                "Impossible de supprimer le client"
-            )
 
         }
 
@@ -193,16 +134,6 @@ export default function ClientsPage() {
         setAddress('')
 
     }
-
-    useEffect(() => {
-
-        const fetchClients = async () => {
-            await loadClients()
-        }
-
-        fetchClients()
-
-    }, [])
 
     if (loading) {
         return <ClientsPageSkeleton />

@@ -1,11 +1,5 @@
 import {useState, useEffect} from "react"
-import {
-    searchQuotes,
-    createQuote,
-    updateQuote,
-    deleteQuote,
-    duplicateQuote
-} from "../api/apiQuote.js"
+import useQuotes from "../hooks/useQuotes"
 
 import {getClients} from "../api/apiClient.js"
 import QuoteModal from "../components/quotes/QuoteModal.jsx"
@@ -17,28 +11,17 @@ import Alert from "../components/common/Alert.jsx"
 
 export default function QuotesPage() {
 
-    const [quotes, setQuotes] = useState([])
-
+    const [uiError, setUiError] = useState(null);
     const [clients, setClients] = useState([])
-
     const [isModalOpen, setIsModalOpen] = useState(false)
-
     const [editingQuote, setEditingQuote] = useState(null)
-
     const [clientId, setClientId] = useState('')
     const [status, setStatus] = useState('DRAFT')
-
     const [search, setSearch] = useState('')
-    const [isSearching, setIsSearching] = useState(false)
     const [statusFilter, setStatusFilter] = useState('')
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
-
     const [page, setPage] = useState(0)
-    const [totalPages, setTotalPages] = useState(0)
-    const [totalElements, setTotalElements] = useState(0)
-
-    const [error, setError] = useState(null)
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] =
         useState(false)
@@ -46,19 +29,42 @@ export default function QuotesPage() {
     const [quoteToDelete, setQuoteToDelete] =
         useState(null)
 
-    const [loading, setLoading] = useState(true)
+    const {
+        quotes,
+        loading,
+        error,
+        totalPages,
+        totalElements,
+        loadQuotes,
+        saveQuote,
+        removeQuote,
+        duplicateQuote,
+    } = useQuotes()
+
+    const refresh = () =>
+        loadQuotes({
+
+            search,
+            status: statusFilter,
+            from,
+            to,
+            page,
+            size: 10
+
+        })
 
     const handleNewQuote = () => {
         if (clients.length === 0) {
 
-            setError(
+            setUiError(
                 "Vous devez créer un client avant de créer un devis."
-            )
+            );
 
             return
 
         }
 
+        setUiError(null)
         setEditingQuote(null)
 
         setClientId('')
@@ -76,43 +82,8 @@ export default function QuotesPage() {
 
         setClientId('')
         setStatus('DRAFT')
+        setUiError(null);
 
-    }
-
-    const loadQuotes = async () => {
-
-        if (!loading) {
-            setIsSearching(true)
-        }
-
-        try {
-
-            const response = await searchQuotes({
-                search,
-                status: statusFilter,
-                from,
-                to,
-                page,
-                size: 10
-            })
-
-            setQuotes(response.data.content)
-            setTotalPages(response.data.totalPages)
-            setTotalElements(response.data.totalElements)
-            setError(null)
-
-        } catch (err) {
-
-            console.error(err)
-
-            setError("Impossible de charger les devis")
-
-        } finally {
-
-            setLoading(false)
-            setIsSearching(false)
-
-        }
     }
 
     const loadClients = async () => {
@@ -151,34 +122,21 @@ export default function QuotesPage() {
 
         try {
 
-            if (editingQuote) {
+            await saveQuote({
 
-                await updateQuote(
-                    editingQuote.id,
-                    clientId,
-                    status
-                )
+                id: editingQuote?.id,
+                clientId,
+                status
 
-            } else {
+            });
 
-                await createQuote(
-                    clientId,
-                    status
-                )
+            await refresh();
 
-            }
-
-            await loadQuotes()
-
-            closeModal()
+            closeModal();
 
         } catch (err) {
 
-            console.error(err)
-
-            setError(
-                "Impossible d'enregistrer le devis"
-            )
+            console.error(err);
 
         }
 
@@ -196,23 +154,17 @@ export default function QuotesPage() {
 
         try {
 
-            await deleteQuote(
+            await removeQuote(
                 quoteToDelete
-            )
+            );
 
-            await loadQuotes()
+            await refresh();
 
-            setIsDeleteModalOpen(false)
-
-            setQuoteToDelete(null)
+            closeDeleteModal();
 
         } catch (err) {
 
-            console.error(err)
-
-            setError(
-                "Impossible de supprimer le devis"
-            )
+            console.error(err);
 
         }
 
@@ -230,17 +182,13 @@ export default function QuotesPage() {
 
         try {
 
-            await duplicateQuote(id)
+            await duplicateQuote(id);
 
-            await loadQuotes()
+            await refresh();
 
         } catch (err) {
 
-            console.error(err)
-
-            setError(
-                "Impossible de dupliquer le devis"
-            )
+            console.error(err);
 
         }
 
@@ -251,12 +199,20 @@ export default function QuotesPage() {
     }, [search, statusFilter, from, to])
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            loadQuotes()
-        }, 300)
 
-        return () => clearTimeout(timer)
-    }, [search, statusFilter, from, to, page])
+        const timer = setTimeout(async () => {
+            refresh();
+        }, 300);
+
+        return () => clearTimeout(timer);
+
+    }, [
+        search,
+        statusFilter,
+        from,
+        to,
+        page
+    ]);
 
     useEffect(() => {
 
@@ -294,12 +250,9 @@ export default function QuotesPage() {
 
             <div className="space-y-6">
 
-                {error && (
-                    <Alert
-                        type="error"
-                        className="mb-4"
-                    >
-                        {error}
+                {(uiError || error) && (
+                    <Alert type="error" className="mb-4">
+                        {uiError || error}
                     </Alert>
                 )}
 

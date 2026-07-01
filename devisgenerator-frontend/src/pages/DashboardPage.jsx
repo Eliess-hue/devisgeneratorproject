@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
+import useDashboard from "../hooks/useDashboard"
 
-import { getDashboard } from '../api/apiDashboard.js'
 import DashboardStatsCards from "../components/dashboard/DashboardStatsCards.jsx"
 import DashboardRevenueChart from "../components/dashboard/DashboardRevenueChart.jsx"
 import DashboardRecentQuotesTable from "../components/dashboard/DashboardRecentQuotesTable.jsx"
@@ -8,51 +7,11 @@ import DashboardPageSkeleton from "../components/skeletons/DashboardPageSkeleton
 
 export default function DashboardPage() {
 
-    const [dashboard, setDashboard] =
-        useState(null)
-
-    const [loading, setLoading] =
-        useState(true)
-
-    const [error, setError] =
-        useState(null)
-
-    const loadDashboard = async () => {
-
-        setLoading(true)
-
-        try {
-
-            const response =
-                await getDashboard()
-
-            setDashboard(
-                response.data
-            )
-
-            setError(null)
-
-        } catch (err) {
-
-            console.error(err)
-
-            setError(
-                'Impossible de charger le tableau de bord'
-            )
-
-        } finally {
-
-            setLoading(false)
-
-        }
-
-    }
-
-    useEffect(() => {
-
-        loadDashboard()
-
-    }, [])
+    const {
+        dashboard,
+        loading,
+        error
+    } = useDashboard()
 
     if (loading) {
         return <DashboardPageSkeleton/>

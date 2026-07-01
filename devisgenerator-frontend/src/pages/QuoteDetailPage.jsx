@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 
-import {
-    getQuoteById,
-    deleteQuoteLine,
-    addQuoteLine,
-    updateQuoteLine,
-    duplicateQuote
-} from '../api/apiQuote'
+import useQuoteDetail from "../hooks/useQuoteDetail.js";
 import {usePageTitle} from "../context/PageTitleContext.jsx"
 
 import QuoteLinesTable from '../components/quotelines/QuoteLinesTable.jsx'
@@ -23,26 +17,24 @@ import QuoteDetailPageSkeleton from "../components/skeletons/QuoteDetailPageSkel
 export default function QuoteDetailPage() {
 
     const navigate = useNavigate()
-
     const { id } = useParams()
-
     const { setPageTitle } = usePageTitle()
 
-    const [quote, setQuote] = useState(null)
-
-    const [loading, setLoading] = useState(true)
-
-    const [error, setError] = useState(null)
+    const {
+        quote,
+        loading,
+        error,
+        saveLine,
+        removeLine,
+        duplicate
+    } = useQuoteDetail(id)
 
     const [isLineModalOpen, setIsLineModalOpen] =
         useState(false)
-
     const [isDeleteModalOpen, setIsDeleteModalOpen] =
         useState(false)
-
     const [lineToDelete, setLineToDelete] =
         useState(null)
-
     const [editingLine, setEditingLine] =
         useState(null)
 
@@ -56,41 +48,19 @@ export default function QuoteDetailPage() {
     const [lineError, setLineError] =
         useState(null)
 
+    useEffect(() => {
 
-    const loadQuote = async () => {
-
-        setLoading(true)
-
-        try {
-
-            const response =
-                await getQuoteById(id)
-
-            setQuote(
-                response.data
-            )
-
-            setPageTitle(
-                response.data.number
-            )
-
-            setError(null)
-
-        } catch (err) {
-
-            console.error(err)
-
-            setError(
-                'Impossible de charger le devis'
-            )
-
-        } finally {
-
-            setLoading(false)
-
+        if (quote) {
+            setPageTitle(quote.number)
         }
 
-    }
+    }, [quote])
+
+    useEffect(() => {
+
+        return () => setPageTitle(null)
+
+    }, [])
 
     const resetLineForm = () => {
 
@@ -115,10 +85,7 @@ export default function QuoteDetailPage() {
             !lineForm.unitPrice
         ) {
 
-            setLineError(
-                'Tous les champs sont obligatoires'
-            )
-
+            setLineError("Tous les champs sont obligatoires");
             return
 
         }
@@ -128,55 +95,30 @@ export default function QuoteDetailPage() {
             Number(lineForm.unitPrice) <= 0
         ) {
 
-            setLineError(
-                'Les valeurs doivent être supérieures à 0'
-            )
-
+            setLineError("Les valeurs doivent être supérieures à 0")
             return
 
         }
 
         try {
 
-            const payload = {
+            await saveLine({
+
+                lineId: editingLine?.id,
+
                 description: lineForm.description,
                 quantity: Number(lineForm.quantity),
                 unitPrice: Number(lineForm.unitPrice),
                 vatRate: Number(lineForm.vatRate)
-            }
 
-            if (editingLine) {
+            })
 
-                await updateQuoteLine(
-                    id,
-                    editingLine.id,
-                    payload
-                )
-
-            } else {
-
-                await addQuoteLine(
-                    id,
-                    payload
-                )
-
-            }
-
-            resetLineForm()
-
-            setIsLineModalOpen(false)
-
-            await loadQuote()
+            resetLineForm();
+            setIsLineModalOpen(false);
 
         } catch (err) {
 
             console.error(err)
-
-            setLineError(
-                editingLine
-                    ? "Impossible de modifier la ligne"
-                    : "Impossible d'ajouter la ligne"
-            )
 
         }
 
@@ -194,7 +136,6 @@ export default function QuoteDetailPage() {
         })
 
         setLineError(null)
-
         setIsLineModalOpen(true)
 
     }
@@ -204,7 +145,6 @@ export default function QuoteDetailPage() {
     ) => {
 
         setLineToDelete(lineId)
-
         setIsDeleteModalOpen(true)
 
     }
@@ -213,22 +153,29 @@ export default function QuoteDetailPage() {
 
         try {
 
-            await deleteQuoteLine(
-                id,
-                lineToDelete
-            )
+            await removeLine(lineToDelete);
 
-            await loadQuote()
-
-            closeDeleteModal()
+            closeDeleteModal();
 
         } catch (err) {
 
-            console.error(err)
+            console.error(err);
 
-            setError(
-                'Impossible de supprimer la ligne'
-            )
+        }
+
+    }
+
+    const handleDuplicate = async () => {
+
+        try {
+
+            const newId = await duplicate();
+
+            navigate(`/quotes/${newId}`);
+
+        } catch (err) {
+
+            console.error(err);
 
         }
 
@@ -237,44 +184,9 @@ export default function QuoteDetailPage() {
     const closeDeleteModal = () => {
 
         setIsDeleteModalOpen(false)
-
         setLineToDelete(null)
 
     }
-
-    const handleDuplicate = async () => {
-
-        try {
-
-            const response = await duplicateQuote(id)
-
-            navigate(`/quotes/${response.data.id}`)
-
-        } catch (err) {
-
-            console.error(err)
-
-            setError(
-                "Impossible de dupliquer le devis"
-            )
-
-        }
-
-    }
-
-    useEffect(() => {
-
-        loadQuote()
-
-    }, [id])
-
-    useEffect(() => {
-
-        return () => {
-            setPageTitle(null)
-        }
-
-    }, [])
 
     if (loading) {
         return <QuoteDetailPageSkeleton/>
