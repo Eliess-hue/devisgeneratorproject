@@ -1,6 +1,7 @@
 package fr.devisgenerator.devisgenerator.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -98,6 +99,42 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(message);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+
+        Throwable cause = ex.getCause();
+
+        while (cause != null) {
+
+            if (cause instanceof org.hibernate.exception.ConstraintViolationException sqlEx) {
+
+                String constraintName = sqlEx.getConstraintName();
+
+                if ("uk_clients_email_user".equals(constraintName)) {
+                    log.warn("Email déjà utilisé pour ce client");
+
+                    return ResponseEntity
+                            .status(HttpStatus.CONFLICT)
+                            .body("Cet email est déjà utilisé pour ce client");
+                }
+
+                log.warn("Contrainte SQL non gérée : {}", constraintName);
+
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body("Conflit de données");
+            }
+
+            cause = cause.getCause();
+        }
+
+        log.warn("Violation d'intégrité non reconnue", ex);
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body("Conflit de données");
     }
 
 }

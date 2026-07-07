@@ -18,7 +18,7 @@ import java.util.UUID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -203,10 +203,71 @@ class ClientControllerIntegrationTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    void createClientShouldReturn409WhenSameUserUsesSameEmail() throws Exception {
+
+        String token = getToken();
+
+        ClientRequest request = new ClientRequest(
+                "ACME",
+                "contact@acme.com",
+                "0102030405",
+                "Paris"
+        );
+
+        // Première création : OK
+        mockMvc.perform(
+                        post("/api/clients")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isCreated());
+
+        // Deuxième création avec le même email
+        mockMvc.perform(
+                        post("/api/clients")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isConflict())
+                .andExpect(content().string("Cet email est déjà utilisé pour ce client"));
+    }
+
+    @Test
+    void createClientShouldAllowSameEmailForDifferentUsers() throws Exception {
+
+        String tokenUser1 = getToken();
+        String tokenUser2 = getToken();
+
+        ClientRequest request = new ClientRequest(
+                "ACME",
+                "contact@acme.com",
+                "0102030405",
+                "Paris"
+        );
+
+        mockMvc.perform(
+                        post("/api/clients")
+                                .header("Authorization", "Bearer " + tokenUser1)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(
+                        post("/api/clients")
+                                .header("Authorization", "Bearer " + tokenUser2)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isCreated());
+    }
+
     private String getToken() throws Exception {
 
-        String username =
-                "user" + System.currentTimeMillis();
+        String username = "user-" + UUID.randomUUID();
 
         RegisterRequest registerRequest =
                 new RegisterRequest(
