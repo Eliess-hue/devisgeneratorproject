@@ -4,7 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name="clients")
+@Table(
+        name = "clients",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_clients_email_user",
+                        columnNames = {"email", "user_id"}
+                )
+        }
+)
 @Getter
 @Setter
 @Builder
@@ -19,7 +27,7 @@ public class Client {
     @Column(nullable=false)
     private String name;
 
-    @Column(nullable=false, unique=true)
+    @Column(nullable=false)
     private String email;
 
     private String phone;
