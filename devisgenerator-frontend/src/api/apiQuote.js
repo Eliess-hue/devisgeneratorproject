@@ -1,8 +1,5 @@
 import axiosConfig from './axiosConfig.js'
 
-export const getQuotes = () =>
-    axiosConfig.get('/api/quotes')
-
 export const createQuote = (
     clientId,
     status
