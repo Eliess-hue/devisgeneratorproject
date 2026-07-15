@@ -21,6 +21,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -565,6 +567,99 @@ class QuoteControllerIntegrationTest {
                 .andExpect(jsonPath("$.totalPages").value(1))
                 .andExpect(jsonPath("$.page").value(0))
                 .andExpect(jsonPath("$.size").value(10));
+    }
+
+    @Test
+    void generatePdfShouldReturn200AndPdf()
+            throws Exception {
+
+        String token = getToken();
+
+        Long clientId =
+                createClient(
+                        token,
+                        validClientRequest()
+                );
+
+        Long quoteId =
+                createQuote(
+                        token,
+                        clientId
+                );
+
+        createQuoteLine(
+                token,
+                quoteId
+        );
+
+        byte[] pdf =
+                mockMvc.perform(
+                                get("/api/quotes/" + quoteId + "/pdf")
+                                        .header(
+                                                "Authorization",
+                                                "Bearer " + token
+                                        )
+                        )
+                        .andExpect(status().isOk())
+                        .andExpect(
+                                content()
+                                        .contentType(MediaType.APPLICATION_PDF)
+                        )
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsByteArray();
+
+
+        assertThat(pdf.length)
+                .isGreaterThan(0);
+    }
+
+    @Test
+    void generatePdfShouldReturn403WhenQuoteDoesNotBelongToUser()
+            throws Exception {
+
+        String ownerToken = getToken();
+
+        Long clientId =
+                createClient(
+                        ownerToken,
+                        validClientRequest()
+                );
+
+        Long quoteId =
+                createQuote(
+                        ownerToken,
+                        clientId
+                );
+
+
+        String otherToken = getToken();
+
+
+        mockMvc.perform(
+                        get("/api/quotes/" + quoteId + "/pdf")
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + otherToken
+                                )
+                )
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void generatePdfShouldReturn404WhenQuoteDoesNotExist()
+            throws Exception {
+
+        String token = getToken();
+
+        mockMvc.perform(
+                        get("/api/quotes/999999/pdf")
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + token
+                                )
+                )
+                .andExpect(status().isNotFound());
     }
 
 }

@@ -316,7 +316,8 @@ public class QuoteServiceImpl implements QuoteService {
         return "DEV-" + year + "-" + nextCounter;
     }
 
-    private Quote getOwnedQuote(Long id, AppUser user) {
+    @Override
+    public Quote getOwnedQuote(Long id, AppUser user) {
 
         Quote quote = quoteRepository.findById(id)
                 .orElseThrow(() -> new QuoteNotFoundException("Quote not found"));
