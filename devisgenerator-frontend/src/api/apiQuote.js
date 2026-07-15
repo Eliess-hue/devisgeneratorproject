@@ -41,6 +41,11 @@ export const searchQuotes = (filters) => {
     })
 }
 
+export const getQuotePdf = (id) =>
+    axiosConfig.get(`/api/quotes/${id}/pdf`, {
+        responseType: 'blob'
+    })
+
 // QuoteLine
 export const getQuoteLines = (quoteId) =>
     axiosConfig.get(`/api/quotes/${quoteId}/lines`)

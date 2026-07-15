@@ -22,7 +22,7 @@ export default function Topbar() {
 
     return (
 
-        <header className="h-20 border-b border-base-300 flex items-center justify-between px-8">
+        <header className="h-20 border-b bg-base-200 border-r border-base-300 flex items-center justify-between px-8">
 
             <h1 className="text-3xl font-bold">
                 {currentTitle}

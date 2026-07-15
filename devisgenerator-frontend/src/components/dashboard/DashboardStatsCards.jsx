@@ -4,7 +4,7 @@ export default function DashboardStatsCards({dashboard}) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
 
-            <div className="card bg-base-200 shadow-sm">
+            <div className="card bg-base-200 shadow-sm rounded-lg">
                 <div className="card-body">
                     <h3 className="text-sm opacity-70">
                         Chiffre d'affaires
@@ -16,7 +16,7 @@ export default function DashboardStatsCards({dashboard}) {
                 </div>
             </div>
 
-            <div className="card bg-base-200 shadow-sm">
+            <div className="card bg-base-200 shadow-sm rounded-lg">
                 <div className="card-body">
                     <h3 className="text-sm opacity-70">
                         Nombre de devis
@@ -28,7 +28,7 @@ export default function DashboardStatsCards({dashboard}) {
                 </div>
             </div>
 
-            <div className="card bg-base-200 shadow-sm">
+            <div className="card bg-base-200 shadow-sm rounded-lg">
                 <div className="card-body">
                     <h3 className="text-sm opacity-70">
                         En attente
@@ -40,7 +40,7 @@ export default function DashboardStatsCards({dashboard}) {
                 </div>
             </div>
 
-            <div className="card bg-base-200 shadow-sm">
+            <div className="card bg-base-200 shadow-sm rounded-lg">
                 <div className="card-body">
                     <h3 className="text-sm opacity-70">
                         Acceptés

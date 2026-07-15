@@ -12,7 +12,7 @@ export default function DashboardRevenueChart({ monthlyRevenues }) {
 
     return (
 
-        <div className="card bg-base-200 shadow-sm">
+        <div className="card bg-base-200 shadow-sm rounded-lg">
 
             <div className="card-body">
 
