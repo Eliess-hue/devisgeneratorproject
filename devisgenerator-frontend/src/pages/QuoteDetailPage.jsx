@@ -13,6 +13,7 @@ import QuoteLineForm from '../components/quotelines/QuoteLineForm.jsx'
 import QuoteLineModal from '../components/quotelines/QuoteLineModal.jsx'
 import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
 import QuoteDetailPageSkeleton from "../components/skeletons/QuoteDetailPageSkeleton.jsx"
+import usePdf from "../hooks/usePdf.js";
 
 export default function QuoteDetailPage() {
 
@@ -28,6 +29,11 @@ export default function QuoteDetailPage() {
         removeLine,
         duplicate
     } = useQuoteDetail(id)
+
+    const {
+        openPdf,
+        error: pdfError
+    } = usePdf()
 
     const [isLineModalOpen, setIsLineModalOpen] =
         useState(false)
@@ -47,6 +53,8 @@ export default function QuoteDetailPage() {
 
     const [lineError, setLineError] =
         useState(null)
+
+    const displayError = error || pdfError
 
     useEffect(() => {
 
@@ -192,7 +200,7 @@ export default function QuoteDetailPage() {
         return <QuoteDetailPageSkeleton/>
     }
 
-    if (error) {
+    if (displayError) {
         return <p>{error}</p>
     }
 
@@ -228,6 +236,7 @@ export default function QuoteDetailPage() {
                     setIsLineModalOpen(true)
                 }
                 onDuplicate={handleDuplicate}
+                onPdf={() => openPdf(id)}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

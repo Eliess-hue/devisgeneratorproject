@@ -3,7 +3,8 @@ import QuoteStatusBadge from './QuoteStatusBadge.jsx'
 export default function QuoteHeader({
                                         quote,
                                         onAddLine,
-                                        onDuplicate
+                                        onDuplicate,
+                                        onPdf
                                     }) {
 
     return (
@@ -43,6 +44,8 @@ export default function QuoteHeader({
                         btn-primary
                         rounded-lg
                     "
+
+                    onClick={onPdf}
                 >
                     PDF
                 </button>

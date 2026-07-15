@@ -284,7 +284,7 @@ export default function QuotesPage() {
                     <input
                         type="text"
                         placeholder="🔍 Rechercher un devis..."
-                        className="input input-bordered rounded-lg"
+                        className="input input-bordered bg-base-200 border-base-300 rounded-lg"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />

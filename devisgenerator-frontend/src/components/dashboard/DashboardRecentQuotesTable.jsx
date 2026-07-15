@@ -1,5 +1,5 @@
-import QuoteStatusBadge
-    from "../quotelines/QuoteStatusBadge.jsx";
+import QuoteStatusBadge from "../quotelines/QuoteStatusBadge.jsx"
+import usePdf from "../../hooks/usePdf"
 
 import { useNavigate } from 'react-router-dom'
 
@@ -7,9 +7,13 @@ export default function DashboardRecentQuotesTable({quotes}) {
 
     const navigate = useNavigate()
 
+    const {
+        openPdf
+    } = usePdf()
+
     return (
 
-        <div className="card bg-base-200 shadow-sm">
+        <div className="card bg-base-200 shadow-sm rounded-lg">
 
             <div className="card-body">
 
@@ -87,7 +91,7 @@ export default function DashboardRecentQuotesTable({quotes}) {
 
                                     <button
                                         className="btn btn-xs btn-primary rounded-lg"
-                                        disabled
+                                        onClick={() => openPdf(quote.id)}
                                     >
                                         PDF
                                     </button>
