@@ -5,6 +5,7 @@ import fr.devisgenerator.devisgenerator.dto.request.QuoteLineRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteRequest;
 import fr.devisgenerator.devisgenerator.dto.response.QuoteResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
+import fr.devisgenerator.devisgenerator.entity.Quote;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -25,6 +26,8 @@ public interface QuoteService {
     QuoteResponse duplicate(Long id, AppUser user);
 
     Page<QuoteResponse> search(QuoteFilterRequest filter, Pageable pageable, AppUser user);
+
+    Quote getOwnedQuote(Long id, AppUser user);
 
     // Gestion des lignes
     QuoteResponse addLine(Long quoteId, QuoteLineRequest request, AppUser user);

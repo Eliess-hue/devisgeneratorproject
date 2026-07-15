@@ -1,11 +1,13 @@
 package fr.devisgenerator.devisgenerator.controller;
 
+import fr.devisgenerator.devisgenerator.dto.pdf.GeneratedPdf;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteFilterRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteLineRequest;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteRequest;
 import fr.devisgenerator.devisgenerator.dto.response.PageResponse;
 import fr.devisgenerator.devisgenerator.dto.response.QuoteResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
+import fr.devisgenerator.devisgenerator.service.QuotePdfService;
 import fr.devisgenerator.devisgenerator.service.QuoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import java.util.List;
 
@@ -29,6 +33,7 @@ import java.util.List;
 public class QuoteController {
 
     private final QuoteService quoteService;
+    private final QuotePdfService quotePdfService;
 
     @Operation(
             summary = "Créer un devis",
@@ -121,6 +126,33 @@ public class QuoteController {
         return PageResponse.from(
                 quoteService.search(filter, pageable, user)
         );
+    }
+
+    @Operation(
+            summary = "Générer le PDF d'un devis",
+            description = "Génère et retourne le PDF du devis demandé"
+    )
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> generatePdf(
+            @PathVariable Long id,
+            @AuthenticationPrincipal AppUser user
+    ) {
+
+        GeneratedPdf pdf =
+                quotePdfService.generatePdf(
+                        id,
+                        user
+                );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" +
+                                pdf.filename() +
+                                "\""
+                )
+                .body(pdf.content());
     }
 
     // Partie Lines

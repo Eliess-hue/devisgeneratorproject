@@ -137,4 +137,15 @@ public class GlobalExceptionHandler {
                 .body("Conflit de données");
     }
 
+    @ExceptionHandler(PdfGenerationException.class)
+    public ResponseEntity<String> handlePdfGenerationException(
+            PdfGenerationException ex) {
+
+        log.error("Erreur lors de la génération du PDF", ex);
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.getMessage());
+    }
+
 }

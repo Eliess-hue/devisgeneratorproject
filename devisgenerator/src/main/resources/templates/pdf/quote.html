@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Devis</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm 1.5cm;
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 10pt;
+            color: #1a1a1a;
+            line-height: 1.45;
+        }
+
+        h1 {
+            font-size: 20pt;
+            color: #3B82F6;
+            margin: 0 0 4pt 0;
+        }
+
+        h2 {
+            font-size: 12pt;
+            color: #1a1a1a;
+            border-bottom: 1pt solid #3B82F6;
+            padding-bottom: 3pt;
+            margin: 16pt 0 6pt 0;
+        }
+
+        p {
+            margin: 0 0 2pt 0;
+        }
+
+        /* Bloc infos devis (numéro, statut, dates) */
+        .quote-meta td {
+            padding: 1pt 6pt 1pt 0;
+        }
+        .quote-meta td:first-child {
+            font-weight: bold;
+            width: 3.5cm;
+        }
+
+        /* Bloc client / émetteur côte à côte */
+        .parties-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .parties-table td {
+            width: 50%;
+            vertical-align: top;
+            padding-right: 1cm;
+        }
+
+        /* Tableau des lignes */
+        .lines-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+            margin-top: 4pt;
+        }
+        .lines-table th,
+        .lines-table td {
+            border: 1pt solid #cccccc;
+            padding: 5pt 6pt;
+        }
+        .lines-table th {
+            background-color: #eef3fc;
+            text-align: left;
+            font-size: 8.5pt;
+            text-transform: uppercase;
+        }
+        .lines-table td.num,
+        .lines-table th.num {
+            text-align: right;
+        }
+        .lines-table col.description { width: 40%; }
+        .lines-table col.qty { width: 8%; }
+        .lines-table col.num { width: 13%; }
+
+        /* Bloc totaux */
+        .totals-table {
+            width: 7cm;
+            margin-left: auto;
+            margin-top: 8pt;
+            border-collapse: collapse;
+        }
+        .totals-table td {
+            padding: 3pt 6pt;
+        }
+        .totals-table td:first-child {
+            text-align: left;
+        }
+        .totals-table td:last-child {
+            text-align: right;
+        }
+        .totals-table .grand-total td {
+            border-top: 1pt solid #1a1a1a;
+            font-weight: bold;
+            font-size: 11pt;
+            padding-top: 5pt;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Devis</h1>
+
+<table class="quote-meta">
+    <tr>
+        <td>Numéro</td>
+        <td th:text="${quote.number}"></td>
+    </tr>
+    <tr>
+        <td>Statut</td>
+        <td th:text="${quote.status}"></td>
+    </tr>
+    <tr>
+        <td>Créé le</td>
+        <td th:text="${quote.createdAt}"></td>
+    </tr>
+    <tr>
+        <td>Valable jusqu'au</td>
+        <td th:text="${quote.validUntil}"></td>
+    </tr>
+</table>
+
+<table class="parties-table">
+    <tr>
+        <td>
+            <h2>Émetteur</h2>
+            <p th:text="${quote.issuer.companyName}"></p>
+            <p th:text="${quote.issuer.address}"></p>
+            <p th:text="${quote.issuer.email}"></p>
+            <p th:text="${quote.issuer.phone}"></p>
+        </td>
+        <td>
+            <h2>Client</h2>
+            <p th:text="${quote.client.name}"></p>
+            <p th:text="${quote.client.address}"></p>
+            <p th:text="${quote.client.email}"></p>
+            <p th:text="${quote.client.phone}"></p>
+        </td>
+    </tr>
+</table>
+
+<h2>Prestations</h2>
+
+<table class="lines-table">
+    <colgroup>
+        <col class="description" />
+        <col class="qty" />
+        <col class="num" />
+        <col class="num" />
+        <col class="num" />
+        <col class="num" />
+        <col class="num" />
+    </colgroup>
+    <thead>
+    <tr>
+        <th>Description</th>
+        <th class="num">Qté</th>
+        <th class="num">PU HT</th>
+        <th class="num">Taux</th>
+        <th class="num">HT</th>
+        <th class="num">TVA</th>
+        <th class="num">TTC</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="line : ${quote.lines}">
+        <td th:text="${line.description}"></td>
+        <td class="num" th:text="${line.quantity}"></td>
+        <td class="num" th:text="${line.unitPrice}"></td>
+        <td class="num" th:text="${line.vatRate}"></td>
+        <td class="num" th:text="${line.totalHt}"></td>
+        <td class="num" th:text="${line.totalTva}"></td>
+        <td class="num" th:text="${line.totalTtc}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<table class="totals-table">
+    <tr>
+        <td>Total HT</td>
+        <td th:text="${quote.totalHt}"></td>
+    </tr>
+    <tr>
+        <td>TVA</td>
+        <td th:text="${quote.totalTva}"></td>
+    </tr>
+    <tr class="grand-total">
+        <td>Total TTC</td>
+        <td th:text="${quote.totalTtc}"></td>
+    </tr>
+</table>
+
+</body>
+</html>
