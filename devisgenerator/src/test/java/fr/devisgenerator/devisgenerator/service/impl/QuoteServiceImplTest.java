@@ -674,4 +674,127 @@ class QuoteServiceImplTest {
                 .findAll(any(Specification.class), any(Pageable.class));
     }
 
+    @Test
+    void markAsSentShouldChangeDraftToPending() {
+
+        // Arrange
+        AppUser user = AppUser.builder()
+                .id(1L)
+                .build();
+
+        Client client = Client.builder()
+                .id(1L)
+                .user(user)
+                .build();
+
+        Quote quote = Quote.builder()
+                .id(1L)
+                .status(QuoteStatus.DRAFT)
+                .client(client)
+                .user(user)
+                .build();
+
+
+        when(quoteRepository.findById(1L))
+                .thenReturn(Optional.of(quote));
+
+
+        // Act
+        quoteService.markAsSent(
+                1L,
+                user
+        );
+
+
+        // Assert
+        assertEquals(
+                QuoteStatus.PENDING,
+                quote.getStatus()
+        );
+
+        verify(quoteRepository)
+                .save(quote);
+    }
+
+    @Test
+    void markAsSentShouldNotChangePendingQuote() {
+
+        // Arrange
+        AppUser user = AppUser.builder()
+                .id(1L)
+                .build();
+
+        Client client = Client.builder()
+                .id(1L)
+                .user(user)
+                .build();
+
+        Quote quote = Quote.builder()
+                .id(1L)
+                .status(QuoteStatus.PENDING)
+                .client(client)
+                .user(user)
+                .build();
+
+
+        when(quoteRepository.findById(1L))
+                .thenReturn(Optional.of(quote));
+
+
+        // Act
+        quoteService.markAsSent(
+                1L,
+                user
+        );
+
+
+        // Assert
+        assertEquals(
+                QuoteStatus.PENDING,
+                quote.getStatus()
+        );
+
+        verify(quoteRepository, never())
+                .save(any());
+    }
+
+    @Test
+    void markAsSentShouldNotChangeAcceptedQuote() {
+
+        AppUser user = AppUser.builder()
+                .id(1L)
+                .build();
+
+        Client client = Client.builder()
+                .id(1L)
+                .user(user)
+                .build();
+
+        Quote quote = Quote.builder()
+                .id(1L)
+                .status(QuoteStatus.ACCEPTED)
+                .client(client)
+                .user(user)
+                .build();
+
+
+        when(quoteRepository.findById(1L))
+                .thenReturn(Optional.of(quote));
+
+
+        quoteService.markAsSent(
+                1L,
+                user
+        );
+
+
+        assertEquals(
+                QuoteStatus.ACCEPTED,
+                quote.getStatus()
+        );
+
+        verify(quoteRepository, never())
+                .save(any());
+    }
+
 }
