@@ -7,6 +7,7 @@ import fr.devisgenerator.devisgenerator.dto.request.QuoteRequest;
 import fr.devisgenerator.devisgenerator.dto.response.PageResponse;
 import fr.devisgenerator.devisgenerator.dto.response.QuoteResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
+import fr.devisgenerator.devisgenerator.service.QuoteEmailService;
 import fr.devisgenerator.devisgenerator.service.QuotePdfService;
 import fr.devisgenerator.devisgenerator.service.QuoteService;
 import jakarta.validation.Valid;
@@ -34,6 +35,7 @@ public class QuoteController {
 
     private final QuoteService quoteService;
     private final QuotePdfService quotePdfService;
+    private final QuoteEmailService quoteEmailService;
 
     @Operation(
             summary = "Créer un devis",
@@ -138,21 +140,34 @@ public class QuoteController {
             @AuthenticationPrincipal AppUser user
     ) {
 
-        GeneratedPdf pdf =
-                quotePdfService.generatePdf(
-                        id,
-                        user
-                );
+        GeneratedPdf pdf = quotePdfService.generatePdf(id, user);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
+                .header(HttpHeaders.CONTENT_DISPOSITION,
                         "inline; filename=\"" +
                                 pdf.filename() +
-                                "\""
-                )
+                                "\"")
                 .body(pdf.content());
+    }
+
+    @Operation(
+            summary = "Envoyer un devis par email",
+            description = """
+            Envoie le devis du client par email avec le PDF généré en pièce jointe.
+            Le destinataire correspond à l'adresse email associée au client du devis.
+            Si l'envoi réussit, un devis ayant le statut DRAFT passe automatiquement à PENDING.
+            """
+    )
+    @PostMapping("/{id}/send-email")
+    public ResponseEntity<String> sendQuoteEmail(
+            @PathVariable Long id,
+            @AuthenticationPrincipal AppUser user
+    ) {
+
+        quoteEmailService.sendQuote(id, user);
+
+        return ResponseEntity.ok("Email envoyé avec succès");
     }
 
     // Partie Lines

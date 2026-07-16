@@ -329,6 +329,21 @@ public class QuoteServiceImpl implements QuoteService {
         return quote;
     }
 
+    @Override
+    public void markAsSent(Long id, AppUser user) {
+
+        Quote quote = getOwnedQuote(id, user);
+
+        if (quote.getStatus() != QuoteStatus.DRAFT) {
+            return;
+        }
+
+        quote.setStatus(QuoteStatus.PENDING);
+        quoteRepository.save(quote);
+
+    }
+
+
     private Client getOwnedClient(Long id, AppUser user) {
 
         Client client = clientRepository.findById(id)
