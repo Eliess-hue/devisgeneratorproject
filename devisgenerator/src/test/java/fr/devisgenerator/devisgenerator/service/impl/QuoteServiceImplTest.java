@@ -91,39 +91,6 @@ class QuoteServiceImplTest {
     }
 
     @Test
-    void findAllShouldReturnQuotesOfUser() {
-
-        AppUser user = AppUser.builder()
-                .id(1L)
-                .build();
-
-        Client client = Client.builder()
-                .id(1L)
-                .name("ACME")
-                .email("contact@acme.com")
-                .user(user)
-                .build();
-
-        Quote quote = Quote.builder()
-                .id(1L)
-                .number("DEV-2024-001")
-                .status(QuoteStatus.DRAFT)
-                .client(client)
-                .user(user)
-                .build();
-
-        when(quoteRepository.findByUser_Id(1L))
-                .thenReturn(List.of(quote));
-
-        List<QuoteResponse> responses =
-                quoteService.findAll(user);
-
-        assertEquals(1, responses.size());
-        assertEquals("DEV-2024-001",
-                responses.get(0).number());
-    }
-
-    @Test
     void findByIdShouldReturnQuoteWhenFound() {
 
         AppUser user = AppUser.builder()

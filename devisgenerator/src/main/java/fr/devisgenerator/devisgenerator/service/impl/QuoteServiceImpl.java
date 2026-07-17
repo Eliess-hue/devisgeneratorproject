@@ -67,15 +67,6 @@ public class QuoteServiceImpl implements QuoteService {
     }
 
     @Override
-    public List<QuoteResponse> findAll(AppUser user) {
-
-        return quoteRepository.findByUser_Id(user.getId())
-                .stream()
-                .map(this::toQuoteResponse)
-                .toList();
-    }
-
-    @Override
     public QuoteResponse findById(Long id, AppUser user) {
 
         return toQuoteResponse(
