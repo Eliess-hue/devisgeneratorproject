@@ -13,7 +13,9 @@ import QuoteLineForm from '../components/quotelines/QuoteLineForm.jsx'
 import QuoteLineModal from '../components/quotelines/QuoteLineModal.jsx'
 import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
 import QuoteDetailPageSkeleton from "../components/skeletons/QuoteDetailPageSkeleton.jsx"
-import usePdf from "../hooks/usePdf.js";
+import usePdf from "../hooks/usePdf.js"
+import useEmail from "../hooks/useEmail.js"
+import Alert from "../components/common/Alert.jsx";
 
 export default function QuoteDetailPage() {
 
@@ -32,8 +34,16 @@ export default function QuoteDetailPage() {
 
     const {
         openPdf,
-        error: pdfError
+        error: pdfError,
+        clearError: clearPdfError
     } = usePdf()
+
+    const {
+        sendEmail,
+        isSending,
+        error: emailError,
+        clearError: clearEmailError
+    } = useEmail()
 
     const [isLineModalOpen, setIsLineModalOpen] =
         useState(false)
@@ -54,7 +64,17 @@ export default function QuoteDetailPage() {
     const [lineError, setLineError] =
         useState(null)
 
-    const displayError = error || pdfError
+    const [successMessage, setSuccessMessage] =
+        useState(null)
+
+    const actionError = pdfError || emailError
+
+    const clearActionError = () => {
+
+        clearPdfError()
+        clearEmailError()
+
+    }
 
     useEffect(() => {
 
@@ -189,6 +209,24 @@ export default function QuoteDetailPage() {
 
     }
 
+    const handleSendEmail = async () => {
+
+        try {
+
+            await sendEmail(quote.id)
+
+            setSuccessMessage(
+                `Le devis a été envoyé à ${quote.client.email}`
+            )
+
+        } catch (err) {
+
+            console.error(err)
+
+        }
+
+    }
+
     const closeDeleteModal = () => {
 
         setIsDeleteModalOpen(false)
@@ -200,7 +238,7 @@ export default function QuoteDetailPage() {
         return <QuoteDetailPageSkeleton/>
     }
 
-    if (displayError) {
+    if (error) {
         return <p>{error}</p>
     }
 
@@ -230,6 +268,26 @@ export default function QuoteDetailPage() {
 
             </div>
 
+            {successMessage && (
+                <Alert
+                    type="success"
+                    autoClose={5000}
+                    onClose={() => setSuccessMessage(null)}
+                >
+                    {successMessage}
+                </Alert>
+            )}
+
+            {actionError && (
+                <Alert
+                    type="error"
+                    autoClose={5000}
+                    onClose={clearActionError}
+                >
+                    {actionError}
+                </Alert>
+            )}
+
             <QuoteHeader
                 quote={quote}
                 onAddLine={() =>
@@ -237,6 +295,8 @@ export default function QuoteDetailPage() {
                 }
                 onDuplicate={handleDuplicate}
                 onPdf={() => openPdf(id)}
+                onSendEmail={handleSendEmail}
+                isSending={isSending}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

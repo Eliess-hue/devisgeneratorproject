@@ -1,8 +1,32 @@
+import { useEffect } from "react"
+
 export default function Alert({
                                   type = "error",
                                   children,
-                                  className = ""
+                                  className = "",
+                                  autoClose = null,
+                                  onClose = null
                               }) {
+
+    useEffect(() => {
+
+        if (!autoClose || !onClose) {
+            return
+        }
+
+        const timer = setTimeout(() => {
+
+            onClose()
+
+        }, autoClose)
+
+        return () => {
+
+            clearTimeout(timer)
+
+        }
+
+    }, [autoClose, onClose])
 
     const variants = {
 
