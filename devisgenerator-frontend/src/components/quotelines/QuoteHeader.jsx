@@ -4,7 +4,9 @@ export default function QuoteHeader({
                                         quote,
                                         onAddLine,
                                         onDuplicate,
-                                        onPdf
+                                        onPdf,
+                                        onSendEmail,
+                                        isSending
                                     }) {
 
     return (
@@ -48,6 +50,24 @@ export default function QuoteHeader({
                     onClick={onPdf}
                 >
                     PDF
+                </button>
+
+                <button
+                    onClick={onSendEmail}
+                    disabled={isSending}
+                    className="
+                        btn
+                        btn-primary
+                        rounded-lg
+                    "
+                >
+
+                    {
+                        isSending
+                            ? "Envoi..."
+                            : "Envoyer par email"
+                    }
+
                 </button>
 
                 <button

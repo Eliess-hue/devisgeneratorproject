@@ -46,6 +46,9 @@ export const getQuotePdf = (id) =>
         responseType: 'blob'
     })
 
+export const sendQuoteEmail = (id) =>
+    axiosConfig.post(`/api/quotes/${id}/send-email`)
+
 // QuoteLine
 export const getQuoteLines = (quoteId) =>
     axiosConfig.get(`/api/quotes/${quoteId}/lines`)
