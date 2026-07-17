@@ -9,13 +9,9 @@ import fr.devisgenerator.devisgenerator.entity.Quote;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface QuoteService {
 
     QuoteResponse create(QuoteRequest request, AppUser user);
-
-    List<QuoteResponse> findAll(AppUser user);
 
     QuoteResponse findById(Long id, AppUser user);
 

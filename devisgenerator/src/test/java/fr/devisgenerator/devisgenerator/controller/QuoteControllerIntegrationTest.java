@@ -73,32 +73,6 @@ class QuoteControllerIntegrationTest {
     }
 
     @Test
-    void findAllQuotesShouldReturn200()
-            throws Exception {
-
-        String token = getToken();
-
-        mockMvc.perform(
-                        get("/api/quotes")
-                                .header(
-                                        "Authorization",
-                                        "Bearer " + token
-                                )
-                )
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void findAllQuotesShouldReturn401WithoutToken()
-            throws Exception {
-
-        mockMvc.perform(
-                        get("/api/quotes")
-                )
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
     void findQuoteByIdShouldReturn200()
             throws Exception {
 
@@ -567,6 +541,16 @@ class QuoteControllerIntegrationTest {
                 .andExpect(jsonPath("$.totalPages").value(1))
                 .andExpect(jsonPath("$.page").value(0))
                 .andExpect(jsonPath("$.size").value(10));
+    }
+
+    @Test
+    void searchQuotesShouldReturn401WithoutToken()
+            throws Exception {
+
+        mockMvc.perform(
+                        get("/api/quotes/search")
+                )
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

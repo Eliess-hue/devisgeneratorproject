@@ -22,8 +22,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import java.util.List;
-
 @Tag(
         name = "Devis",
         description = "Gestion des devis"
@@ -48,17 +46,6 @@ public class QuoteController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(quoteService.create(request, user));
-    }
-
-    @Operation(
-            summary = "Lister les devis",
-            description = "Retourne tous les devis de l'utilisateur connecté"
-    )
-    @GetMapping
-    public List<QuoteResponse> findAll(
-            @AuthenticationPrincipal AppUser user) {
-
-        return quoteService.findAll(user);
     }
 
     @Operation(
