@@ -19,6 +19,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUserAlreadyExists(
             UserAlreadyExistsException ex) {
 
+        log.warn(ex.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(ex.getMessage());
@@ -27,6 +29,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<String> handleInvalidCredentials(
             InvalidCredentialsException ex) {
+
+        log.warn(ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
@@ -37,6 +41,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleClientNotFound(
             ClientNotFoundException ex) {
 
+        log.warn(ex.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
@@ -45,6 +51,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(QuoteNotFoundException.class)
     public ResponseEntity<String> handleQuoteNotFound(
             QuoteNotFoundException ex) {
+
+        log.warn(ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -55,6 +63,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleQuoteLineNotFound(
             QuoteLineNotFoundException ex) {
 
+        log.warn(ex.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
@@ -64,6 +74,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleInvalidQuoteLine(
             InvalidQuoteLineException ex) {
 
+        log.warn(ex.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
@@ -72,6 +84,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<String> handleAccessDenied(
             AccessDeniedException ex) {
+
+        log.warn(ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)

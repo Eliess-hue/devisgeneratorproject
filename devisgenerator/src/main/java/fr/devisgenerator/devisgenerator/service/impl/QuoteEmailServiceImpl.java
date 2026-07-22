@@ -11,12 +11,14 @@ import fr.devisgenerator.devisgenerator.service.QuoteService;
 import fr.devisgenerator.devisgenerator.service.email.EmailSender;
 import fr.devisgenerator.devisgenerator.util.PdfFormatter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -29,10 +31,7 @@ public class QuoteEmailServiceImpl implements QuoteEmailService {
     private final EmailSender emailSender;
 
     @Override
-    public void sendQuote(
-            Long quoteId,
-            AppUser user
-    ) {
+    public void sendQuote(Long quoteId, AppUser user) {
 
         Quote quote =
                 quoteService.getOwnedQuote(
@@ -71,6 +70,13 @@ public class QuoteEmailServiceImpl implements QuoteEmailService {
         quoteService.markAsSent(
                 quoteId,
                 user
+        );
+
+        log.info(
+                "Quote {} sent by email to client {} by user {}",
+                quote.getNumber(),
+                quote.getClient().getId(),
+                user.getId()
         );
     }
 

@@ -13,6 +13,7 @@ import fr.devisgenerator.devisgenerator.service.QuotePdfService;
 import fr.devisgenerator.devisgenerator.service.QuoteService;
 import fr.devisgenerator.devisgenerator.util.PdfFormatter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -22,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class QuotePdfServiceImpl implements QuotePdfService {
@@ -41,6 +43,12 @@ public class QuotePdfServiceImpl implements QuotePdfService {
         String html = generateHtml(pdfView);
 
         byte[] pdf = generatePdfBytes(html);
+
+        log.info(
+                "PDF generated for quote {} by user {}",
+                quote.getNumber(),
+                user.getId()
+        );
 
         return new GeneratedPdf(
                 quote.getNumber() + ".pdf",
@@ -132,9 +140,7 @@ public class QuotePdfServiceImpl implements QuotePdfService {
         );
     }
 
-    private ClientPdfView buildClientPdfView(
-            Client client
-    ) {
+    private ClientPdfView buildClientPdfView(Client client) {
         return new ClientPdfView(
                 client.getName(),
                 client.getEmail(),
@@ -153,9 +159,7 @@ public class QuotePdfServiceImpl implements QuotePdfService {
         );
     }
 
-    private String generateHtml(
-            QuotePdfView view
-    ) {
+    private String generateHtml(QuotePdfView view) {
         Context context = new Context();
 
         context.setVariable(

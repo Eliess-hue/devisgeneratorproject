@@ -62,11 +62,19 @@ public class ClientServiceImpl implements ClientService {
 
         // 1. récupérer client
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new ClientNotFoundException("Client not found"));
+                .orElseThrow(() ->
+                        new ClientNotFoundException(
+                                "Client " + id + " not found"
+                        ));
 
         // 2. vérifier propriétaire
         if (!client.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException(
+                    "Access denied: user "
+                            + user.getId()
+                            + " attempted to access client "
+                            + id
+            );
         }
 
         // 3. retourner réponse
@@ -78,11 +86,19 @@ public class ClientServiceImpl implements ClientService {
 
         // 1. récupérer client
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new ClientNotFoundException("Client not found"));
+                .orElseThrow(() ->
+                        new ClientNotFoundException(
+                                "Client " + id + " not found"
+                        ));
 
         // 2. vérifier propriétaire
         if (!client.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException(
+                    "Access denied: user "
+                            + user.getId()
+                            + " attempted to access client "
+                            + id
+            );
         }
 
         // 3. mettre à jour les données
@@ -103,11 +119,19 @@ public class ClientServiceImpl implements ClientService {
 
         // 1. récupérer client
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new ClientNotFoundException("Client not found"));
+                .orElseThrow(() ->
+                        new ClientNotFoundException(
+                                "Client " + id + " not found"
+                        ));
 
         // 2. vérifier propriétaire
         if (!client.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException(
+                    "Access denied: user "
+                            + user.getId()
+                            + " attempted to access client "
+                            + id
+            );
         }
 
         // 3. supprimer
