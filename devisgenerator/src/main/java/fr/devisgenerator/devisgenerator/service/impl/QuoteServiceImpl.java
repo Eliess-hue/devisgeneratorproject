@@ -22,6 +22,7 @@ import fr.devisgenerator.devisgenerator.repository.QuoteRepository;
 import fr.devisgenerator.devisgenerator.service.QuoteService;
 import fr.devisgenerator.devisgenerator.specification.QuoteSpecification;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -34,6 +35,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class QuoteServiceImpl implements QuoteService {
@@ -62,6 +64,14 @@ public class QuoteServiceImpl implements QuoteService {
 
         quote = quoteRepository.save(quote);
 
+
+        log.info(
+                "Quote {} created by user {} for client {}",
+                quote.getNumber(),
+                user.getId(),
+                client.getId()
+        );
+
         return toQuoteResponse(quote);
 
     }
@@ -83,15 +93,27 @@ public class QuoteServiceImpl implements QuoteService {
 
         quote = quoteRepository.save(quote);
 
+        log.info(
+                "Quote {} updated by user {}",
+                quote.getNumber(),
+                user.getId()
+        );
+
         return toQuoteResponse(quote);
     }
 
     @Override
     public void delete(Long id, AppUser user) {
 
-        quoteRepository.delete(
-                getOwnedQuote(id, user)
+        Quote quote = getOwnedQuote(id, user);
+
+        log.info(
+                "Quote {} deleted by user {}",
+                quote.getNumber(),
+                user.getId()
         );
+
+        quoteRepository.delete(quote);
     }
 
     @Transactional
@@ -131,6 +153,13 @@ public class QuoteServiceImpl implements QuoteService {
         quoteLineRepository.saveAll(duplicatedLines);
 
         recalculateTotals(duplicatedQuote);
+
+        log.info(
+                "Quote {} duplicated into {} by user {}",
+                originalQuote.getNumber(),
+                duplicatedQuote.getNumber(),
+                user.getId()
+        );
 
         return toQuoteResponse(duplicatedQuote);
     }
@@ -174,6 +203,13 @@ public class QuoteServiceImpl implements QuoteService {
 
         recalculateTotals(quote);
 
+        log.info(
+                "Line {} added to quote {} by user {}",
+                line.getId(),
+                quote.getNumber(),
+                user.getId()
+        );
+
         return toQuoteResponse(quote);
     }
 
@@ -197,6 +233,13 @@ public class QuoteServiceImpl implements QuoteService {
 
         recalculateTotals(quote);
 
+        log.info(
+                "Line {} updated in quote {} by user {}",
+                line.getId(),
+                quote.getNumber(),
+                user.getId()
+        );
+
         return toQuoteResponse(quote);
 
     }
@@ -210,6 +253,13 @@ public class QuoteServiceImpl implements QuoteService {
         QuoteLine line = getOwnedQuoteLine(
                 quote.getId(),
                 lineId
+        );
+
+        log.info(
+                "Line {} removed from quote {} by user {}",
+                line.getId(),
+                quote.getNumber(),
+                user.getId()
         );
 
         quoteLineRepository.delete(line);
@@ -311,10 +361,18 @@ public class QuoteServiceImpl implements QuoteService {
     public Quote getOwnedQuote(Long id, AppUser user) {
 
         Quote quote = quoteRepository.findById(id)
-                .orElseThrow(() -> new QuoteNotFoundException("Quote not found"));
+                .orElseThrow(() ->
+                        new QuoteNotFoundException(
+                                "Quote " + id + " not found"
+                        ));
 
         if (!quote.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException(
+                    "Access denied: user "
+                            + user.getId()
+                            + " attempted to access quote "
+                            + id
+            );
         }
 
         return quote;
@@ -332,16 +390,30 @@ public class QuoteServiceImpl implements QuoteService {
         quote.setStatus(QuoteStatus.PENDING);
         quoteRepository.save(quote);
 
+        log.info(
+                "Quote {} marked as PENDING by user {}",
+                quote.getNumber(),
+                user.getId()
+        );
+
     }
 
 
     private Client getOwnedClient(Long id, AppUser user) {
 
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new ClientNotFoundException("Client not found"));
+                .orElseThrow(() ->
+                        new ClientNotFoundException(
+                                "Client " + id + " not found"
+                        ));
 
         if (!client.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException(
+                    "Access denied: user "
+                            + user.getId()
+                            + " attempted to access client "
+                            + id
+            );
         }
 
         return client;
@@ -353,11 +425,16 @@ public class QuoteServiceImpl implements QuoteService {
 
         QuoteLine line = quoteLineRepository.findById(lineId)
                 .orElseThrow(() ->
-                        new QuoteLineNotFoundException("Quote line not found"));
+                        new QuoteLineNotFoundException(
+                                "Quote line " + lineId + " not found"
+                        ));
 
         if (!line.getQuote().getId().equals(quoteId)) {
             throw new InvalidQuoteLineException(
-                    "Quote line does not belong to quote"
+                    "Quote line "
+                            + lineId
+                            + " does not belong to quote "
+                            + quoteId
             );
         }
 

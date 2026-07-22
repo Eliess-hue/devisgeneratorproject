@@ -27,7 +27,9 @@ public class AuthServiceImpl implements AuthService {
 
         // 1. vérifier si username existe déjà
         if (userRepository.findByUsername(request.username()).isPresent()) {
-            throw new UserAlreadyExistsException("Username already exists");
+            throw new UserAlreadyExistsException(
+                    "Username " + request.username() + " already exists"
+            );
         }
 
         // 2. créer user
@@ -47,11 +49,18 @@ public class AuthServiceImpl implements AuthService {
 
         // 1. trouver user
         AppUser user = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+                .orElseThrow(() ->
+                        new InvalidCredentialsException(
+                                "Invalid credentials for username "
+                                        + request.username()
+                        ));
 
         // 2. vérifier password
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid credentials");
+            throw new InvalidCredentialsException(
+                    "Invalid credentials for username "
+                            + request.username()
+            );
         }
 
         // 3. générer token
