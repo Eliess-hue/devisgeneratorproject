@@ -2,14 +2,22 @@ package fr.devisgenerator.devisgenerator.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.devisgenerator.devisgenerator.dto.request.*;
+import fr.devisgenerator.devisgenerator.entity.AppUser;
+import fr.devisgenerator.devisgenerator.entity.Client;
+import fr.devisgenerator.devisgenerator.entity.Quote;
 import fr.devisgenerator.devisgenerator.enums.QuoteStatus;
+import fr.devisgenerator.devisgenerator.enums.UserRole;
+import fr.devisgenerator.devisgenerator.repository.AppUserRepository;
+import fr.devisgenerator.devisgenerator.repository.ClientRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteLineRepository;
+import fr.devisgenerator.devisgenerator.repository.QuoteRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -23,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -38,6 +47,18 @@ class QuoteControllerIntegrationTest {
 
     @Autowired
     private QuoteLineRepository quoteLineRepository;
+
+    @Autowired
+    private QuoteRepository quoteRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private AppUserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Test
     void createQuoteShouldReturn201() throws Exception {
@@ -644,6 +665,195 @@ class QuoteControllerIntegrationTest {
                                 )
                 )
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void searchShouldReturnAllQuotesForAdmin() throws Exception {
+
+        AppUser user1 = createUser(
+                "quote-user-1",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        AppUser user2 = createUser(
+                "quote-user-2",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        createUser(
+                "quote-admin",
+                "password123",
+                UserRole.ROLE_ADMIN
+        );
+
+        Client client1 = createClient(
+                "Alice",
+                "alice@test.fr",
+                user1
+        );
+
+        Client client2 = createClient(
+                "Bob",
+                "bob@test.fr",
+                user2
+        );
+
+        createQuote(
+                "DEV-2025-001",
+                client1,
+                user1
+        );
+
+        createQuote(
+                "DEV-2025-002",
+                client2,
+                user2
+        );
+
+        String token = loginAndGetToken(
+                "quote-admin",
+                "password123"
+        );
+
+        mockMvc.perform(
+                        get("/api/quotes/search")
+                                .header("Authorization", "Bearer " + token)
+                                .param("page", "0")
+                                .param("size", "50")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("DEV-2025-001")))
+                .andExpect(content().string(containsString("DEV-2025-002")));
+    }
+
+    @Test
+    void searchShouldReturnOnlyOwnedQuotesForUser() throws Exception {
+
+        AppUser user1 = createUser(
+                "quote-owner",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        AppUser user2 = createUser(
+                "quote-other",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        Client client1 = createClient(
+                "Alice",
+                "alice@test.fr",
+                user1
+        );
+
+        Client client2 = createClient(
+                "Bob",
+                "bob@test.fr",
+                user2
+        );
+
+        createQuote(
+                "DEV-2025-001",
+                client1,
+                user1
+        );
+
+        createQuote(
+                "DEV-2025-002",
+                client2,
+                user2
+        );
+
+        String token = loginAndGetToken(
+                "quote-owner",
+                "password123"
+        );
+
+        mockMvc.perform(
+                        get("/api/quotes/search")
+                                .header("Authorization", "Bearer " + token)
+                                .param("page", "0")
+                                .param("size", "10")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].number")
+                        .value("DEV-2025-001"));
+    }
+
+    private AppUser createUser(
+            String username,
+            String password,
+            UserRole role) {
+
+        AppUser user = AppUser.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .role(role.name())
+                .build();
+
+        return userRepository.save(user);
+    }
+
+    private String loginAndGetToken(
+            String username,
+            String password
+    ) throws Exception {
+
+        LoginRequest request =
+                new LoginRequest(username, password);
+
+        String response =
+                mockMvc.perform(post("/api/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        return objectMapper.readTree(response)
+                .get("token")
+                .asText();
+    }
+
+    private Client createClient(
+            String name,
+            String email,
+            AppUser owner
+    ) {
+
+        Client client = Client.builder()
+                .name(name)
+                .email(email)
+                .phone("0102030405")
+                .address("1 rue des Test")
+                .user(owner)
+                .build();
+
+        return clientRepository.save(client);
+    }
+
+    private Quote createQuote(
+            String number,
+            Client client,
+            AppUser owner
+    ) {
+
+        Quote quote = Quote.builder()
+                .number(number)
+                .status(QuoteStatus.DRAFT)
+                .client(client)
+                .user(owner)
+                .totalHt(BigDecimal.ZERO)
+                .totalTva(BigDecimal.ZERO)
+                .totalTtc(BigDecimal.ZERO)
+                .build();
+
+        return quoteRepository.save(quote);
     }
 
 }

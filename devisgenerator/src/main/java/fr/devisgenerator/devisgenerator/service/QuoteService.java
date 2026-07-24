@@ -23,7 +23,7 @@ public interface QuoteService {
 
     Page<QuoteResponse> search(QuoteFilterRequest filter, Pageable pageable, AppUser user);
 
-    Quote getOwnedQuote(Long id, AppUser user);
+    Quote getAccessibleQuote(Long id, AppUser user);
 
     void markAsSent(Long id, AppUser user);
 

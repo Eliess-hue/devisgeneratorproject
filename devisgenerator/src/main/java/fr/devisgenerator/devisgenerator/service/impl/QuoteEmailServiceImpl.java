@@ -34,7 +34,7 @@ public class QuoteEmailServiceImpl implements QuoteEmailService {
     public void sendQuote(Long quoteId, AppUser user) {
 
         Quote quote =
-                quoteService.getOwnedQuote(
+                quoteService.getAccessibleQuote(
                         quoteId,
                         user
                 );

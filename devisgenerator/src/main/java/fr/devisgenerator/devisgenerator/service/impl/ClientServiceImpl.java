@@ -5,6 +5,7 @@ import fr.devisgenerator.devisgenerator.dto.response.ClientResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
 import fr.devisgenerator.devisgenerator.entity.Client;
 import fr.devisgenerator.devisgenerator.entity.Quote;
+import fr.devisgenerator.devisgenerator.enums.UserRole;
 import fr.devisgenerator.devisgenerator.exception.ClientNotFoundException;
 import fr.devisgenerator.devisgenerator.repository.ClientRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteRepository;
@@ -27,7 +28,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public ClientResponse create(ClientRequest request, AppUser user) {
 
-        // 1. créer client
+        // créer client
         Client client = Client.builder()
                 .name(request.name())
                 .email(request.email())
@@ -36,10 +37,10 @@ public class ClientServiceImpl implements ClientService {
                 .user(user)
                 .build();
 
-        // 2. sauvegarder
+        // sauvegarder
         client = clientRepository.save(client);
 
-        // 3. retourner réponse
+        // retourner réponse
         return toClientResponse(client);
 
     }
@@ -47,10 +48,17 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public List<ClientResponse> findAll(AppUser user) {
 
-        // 1. récupérer tous les clients du propriétaire connecté
-        List<Client> clients = clientRepository.findByUser_Id(user.getId());
+        // récupérer tous les clients du propriétaire connecté
+        // et en tant qu'administrateur
+        List<Client> clients;
 
-        // 2. convertir et retourner chaque Client en ClientResponse
+        if (isAdmin(user)) {
+            clients = clientRepository.findAll();
+        } else {
+            clients = clientRepository.findByUser_Id(user.getId());
+        }
+
+        // convertir et retourner chaque Client en ClientResponse
         return clients.stream()
                 .map(this::toClientResponse)
                 .toList();
@@ -60,81 +68,33 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public ClientResponse findById(Long id, AppUser user) {
 
-        // 1. récupérer client
-        Client client = clientRepository.findById(id)
-                .orElseThrow(() ->
-                        new ClientNotFoundException(
-                                "Client " + id + " not found"
-                        ));
+        Client client = getAccessibleClient(id, user);
 
-        // 2. vérifier propriétaire
-        if (!client.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException(
-                    "Access denied: user "
-                            + user.getId()
-                            + " attempted to access client "
-                            + id
-            );
-        }
-
-        // 3. retourner réponse
         return toClientResponse(client);
     }
 
     @Override
     public ClientResponse update(Long id, ClientRequest request, AppUser user) {
 
-        // 1. récupérer client
-        Client client = clientRepository.findById(id)
-                .orElseThrow(() ->
-                        new ClientNotFoundException(
-                                "Client " + id + " not found"
-                        ));
+        Client client = getAccessibleClient(id, user);
 
-        // 2. vérifier propriétaire
-        if (!client.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException(
-                    "Access denied: user "
-                            + user.getId()
-                            + " attempted to access client "
-                            + id
-            );
-        }
-
-        // 3. mettre à jour les données
+        // mettre à jour les données
         client.setName(request.name());
         client.setEmail(request.email());
         client.setPhone(request.phone());
         client.setAddress(request.address());
 
-        // 4. sauvegarder
+        // sauvegarder
         client = clientRepository.save(client);
 
-        // 5. retourner réponse
         return toClientResponse(client);
     }
 
     @Override
     public void delete(Long id, AppUser user) {
 
-        // 1. récupérer client
-        Client client = clientRepository.findById(id)
-                .orElseThrow(() ->
-                        new ClientNotFoundException(
-                                "Client " + id + " not found"
-                        ));
+        Client client = getAccessibleClient(id, user);
 
-        // 2. vérifier propriétaire
-        if (!client.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException(
-                    "Access denied: user "
-                            + user.getId()
-                            + " attempted to access client "
-                            + id
-            );
-        }
-
-        // 3. supprimer
         clientRepository.delete(client);
     }
 
@@ -164,6 +124,36 @@ public class ClientServiceImpl implements ClientService {
                 quoteCount,
                 lastQuoteNumber
         );
+    }
+
+    private boolean isAdmin(AppUser user) {
+        return UserRole.ROLE_ADMIN.name().equals(user.getRole());
+    }
+
+    private Client getAccessibleClient(Long id, AppUser user) {
+
+        // récupérer client
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() ->
+                        new ClientNotFoundException(
+                                "Client " + id + " not found"
+                        ));
+
+        // vérifier administrateur & propriétaire
+        if (isAdmin(user)) {
+            return client;
+        }
+
+        if (!client.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException(
+                    "Access denied: user "
+                            + user.getId()
+                            + " attempted to access client "
+                            + id
+            );
+        }
+
+        return client;
     }
 
 }

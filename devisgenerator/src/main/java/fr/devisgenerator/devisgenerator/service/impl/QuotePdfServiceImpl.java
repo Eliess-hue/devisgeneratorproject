@@ -36,7 +36,7 @@ public class QuotePdfServiceImpl implements QuotePdfService {
     @Override
     public GeneratedPdf generatePdf(Long quoteId, AppUser user) {
 
-        Quote quote = quoteService.getOwnedQuote(quoteId, user);
+        Quote quote = quoteService.getAccessibleQuote(quoteId, user);
 
         QuotePdfView pdfView = buildPdfView(quote);
 
