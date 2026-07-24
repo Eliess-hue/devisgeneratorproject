@@ -76,7 +76,7 @@ class QuoteEmailServiceImplTest {
                 new byte[]{1, 2, 3}
         );
 
-        when(quoteService.getOwnedQuote(1L, user))
+        when(quoteService.getAccessibleQuote(1L, user))
                 .thenReturn(quote);
 
         when(quotePdfService.generatePdf(1L, user))
@@ -146,7 +146,7 @@ class QuoteEmailServiceImplTest {
                 new byte[]{1, 2, 3}
         );
 
-        when(quoteService.getOwnedQuote(1L, user))
+        when(quoteService.getAccessibleQuote(1L, user))
                 .thenReturn(quote);
 
         when(quotePdfService.generatePdf(1L, user))

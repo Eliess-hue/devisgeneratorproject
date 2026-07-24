@@ -12,6 +12,7 @@ import fr.devisgenerator.devisgenerator.entity.Client;
 import fr.devisgenerator.devisgenerator.entity.Quote;
 import fr.devisgenerator.devisgenerator.entity.QuoteLine;
 import fr.devisgenerator.devisgenerator.enums.QuoteStatus;
+import fr.devisgenerator.devisgenerator.enums.UserRole;
 import fr.devisgenerator.devisgenerator.exception.ClientNotFoundException;
 import fr.devisgenerator.devisgenerator.exception.InvalidQuoteLineException;
 import fr.devisgenerator.devisgenerator.exception.QuoteLineNotFoundException;
@@ -48,7 +49,7 @@ public class QuoteServiceImpl implements QuoteService {
     @Override
     public QuoteResponse create(QuoteRequest request, AppUser user) {
 
-        Client client = getOwnedClient(request.clientId(), user);
+        Client client = getAccessibleClient(request.clientId(), user);
 
         String quoteNumber = generateQuoteNumber();
 
@@ -80,14 +81,14 @@ public class QuoteServiceImpl implements QuoteService {
     public QuoteResponse findById(Long id, AppUser user) {
 
         return toQuoteResponse(
-                getOwnedQuote(id, user)
+                getAccessibleQuote(id, user)
         );
     }
 
     @Override
     public QuoteResponse update(Long id, QuoteRequest request, AppUser user) {
 
-        Quote quote = getOwnedQuote(id, user);
+        Quote quote = getAccessibleQuote(id, user);
 
         quote.setStatus(request.status());
 
@@ -105,7 +106,7 @@ public class QuoteServiceImpl implements QuoteService {
     @Override
     public void delete(Long id, AppUser user) {
 
-        Quote quote = getOwnedQuote(id, user);
+        Quote quote = getAccessibleQuote(id, user);
 
         log.info(
                 "Quote {} deleted by user {}",
@@ -120,7 +121,7 @@ public class QuoteServiceImpl implements QuoteService {
     @Override
     public QuoteResponse duplicate(Long id, AppUser user) {
 
-        Quote originalQuote = getOwnedQuote(id, user);
+        Quote originalQuote = getAccessibleQuote(id, user);
 
         Quote newQuote = Quote.builder()
                 .number(generateQuoteNumber())
@@ -168,7 +169,6 @@ public class QuoteServiceImpl implements QuoteService {
     public Page<QuoteResponse> search(QuoteFilterRequest filter, Pageable pageable, AppUser user) {
 
         Specification<Quote> spec = Specification.allOf(
-                QuoteSpecification.hasUser(user.getId()),
                 QuoteSpecification.hasSearch(filter.search()),
                 QuoteSpecification.hasStatus(filter.status()),
                 QuoteSpecification.isBetweenDates(
@@ -177,9 +177,42 @@ public class QuoteServiceImpl implements QuoteService {
                 )
         );
 
+        if (!isAdmin(user)) {
+            spec = spec.and(QuoteSpecification.hasUser(user.getId()));
+        }
+
         return quoteRepository
                 .findAll(spec, pageable)
                 .map(this::toQuoteResponse);
+    }
+
+    private boolean isAdmin(AppUser user) {
+        return UserRole.ROLE_ADMIN.name().equals(user.getRole());
+    }
+
+    @Override
+    public Quote getAccessibleQuote(Long id, AppUser user) {
+
+        Quote quote = quoteRepository.findById(id)
+                .orElseThrow(() ->
+                        new QuoteNotFoundException(
+                                "Quote " + id + " not found"
+                        ));
+
+        if (isAdmin(user)) {
+            return quote;
+        }
+
+        if (!quote.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException(
+                    "Access denied: user "
+                            + user.getId()
+                            + " attempted to access quote "
+                            + id
+            );
+        }
+
+        return quote;
 
     }
 
@@ -189,7 +222,7 @@ public class QuoteServiceImpl implements QuoteService {
     @Override
     public QuoteResponse addLine(Long quoteId, QuoteLineRequest request, AppUser user) {
 
-        Quote quote = getOwnedQuote(quoteId, user);
+        Quote quote = getAccessibleQuote(quoteId, user);
 
         QuoteLine line = QuoteLine.builder()
                 .quote(quote)
@@ -217,9 +250,9 @@ public class QuoteServiceImpl implements QuoteService {
     @Override
     public QuoteResponse updateLine(Long quoteId, Long lineId, QuoteLineRequest request, AppUser user) {
 
-        Quote quote = getOwnedQuote(quoteId, user);
+        Quote quote = getAccessibleQuote(quoteId, user);
 
-        QuoteLine line = getOwnedQuoteLine(
+        QuoteLine line = getValidatedQuoteLine(
                 quote.getId(),
                 lineId
         );
@@ -248,9 +281,9 @@ public class QuoteServiceImpl implements QuoteService {
     @Override
     public QuoteResponse deleteLine(Long quoteId, Long lineId, AppUser user) {
 
-        Quote quote = getOwnedQuote(quoteId, user);
+        Quote quote = getAccessibleQuote(quoteId, user);
 
-        QuoteLine line = getOwnedQuoteLine(
+        QuoteLine line = getValidatedQuoteLine(
                 quote.getId(),
                 lineId
         );
@@ -357,31 +390,12 @@ public class QuoteServiceImpl implements QuoteService {
         return "DEV-" + year + "-" + nextCounter;
     }
 
-    @Override
-    public Quote getOwnedQuote(Long id, AppUser user) {
 
-        Quote quote = quoteRepository.findById(id)
-                .orElseThrow(() ->
-                        new QuoteNotFoundException(
-                                "Quote " + id + " not found"
-                        ));
-
-        if (!quote.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException(
-                    "Access denied: user "
-                            + user.getId()
-                            + " attempted to access quote "
-                            + id
-            );
-        }
-
-        return quote;
-    }
 
     @Override
     public void markAsSent(Long id, AppUser user) {
 
-        Quote quote = getOwnedQuote(id, user);
+        Quote quote = getAccessibleQuote(id, user);
 
         if (quote.getStatus() != QuoteStatus.DRAFT) {
             return;
@@ -399,13 +413,17 @@ public class QuoteServiceImpl implements QuoteService {
     }
 
 
-    private Client getOwnedClient(Long id, AppUser user) {
+    private Client getAccessibleClient(Long id, AppUser user) {
 
         Client client = clientRepository.findById(id)
                 .orElseThrow(() ->
                         new ClientNotFoundException(
                                 "Client " + id + " not found"
                         ));
+
+        if (isAdmin(user)) {
+            return client;
+        }
 
         if (!client.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException(
@@ -419,7 +437,7 @@ public class QuoteServiceImpl implements QuoteService {
         return client;
     }
 
-    private QuoteLine getOwnedQuoteLine(
+    private QuoteLine getValidatedQuoteLine(
             Long quoteId,
             Long lineId) {
 

@@ -4,12 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.devisgenerator.devisgenerator.dto.request.ClientRequest;
 import fr.devisgenerator.devisgenerator.dto.request.LoginRequest;
 import fr.devisgenerator.devisgenerator.dto.request.RegisterRequest;
+import fr.devisgenerator.devisgenerator.entity.AppUser;
+import fr.devisgenerator.devisgenerator.entity.Client;
+import fr.devisgenerator.devisgenerator.enums.UserRole;
+import fr.devisgenerator.devisgenerator.repository.AppUserRepository;
+import fr.devisgenerator.devisgenerator.repository.ClientRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,6 +25,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.containsString;
+
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -31,6 +40,15 @@ class ClientControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private AppUserRepository userRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Test
     void createClientShouldReturn201() throws Exception {
@@ -265,6 +283,90 @@ class ClientControllerIntegrationTest {
                 .andExpect(status().isCreated());
     }
 
+    @Test
+    void findAllShouldReturnAllClientsForAdmin() throws Exception {
+
+        AppUser user1 = createUser(
+                "client-user-1",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        AppUser user2 = createUser(
+                "client-user-2",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        createUser(
+                "client-admin",
+                "password123",
+                UserRole.ROLE_ADMIN
+        );
+
+        createClient(
+                "Alice",
+                "alice@test.fr",
+                user1
+        );
+
+        createClient(
+                "Bob",
+                "bob@test.fr",
+                user2
+        );
+
+        String token = loginAndGetToken(
+                "client-admin",
+                "password123"
+        );
+
+        mockMvc.perform(get("/api/clients")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Alice")))
+                .andExpect(content().string(containsString("Bob")));
+    }
+
+    @Test
+    void findAllShouldReturnOnlyOwnedClientsForUser() throws Exception {
+
+        AppUser user1 = createUser(
+                "client-owner",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        AppUser user2 = createUser(
+                "client-other",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        createClient(
+                "Alice",
+                "alice@test.fr",
+                user1
+        );
+
+        createClient(
+                "Bob",
+                "bob@test.fr",
+                user2
+        );
+
+        String token = loginAndGetToken(
+                "client-owner",
+                "password123"
+        );
+
+        mockMvc.perform(get("/api/clients")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].name").value("Alice"));
+    }
+
     private String getToken() throws Exception {
 
         String username = "user-" + UUID.randomUUID();
@@ -350,6 +452,59 @@ class ClientControllerIntegrationTest {
                 "0102030405",
                 "Paris"
         );
+    }
+
+    private AppUser createUser(
+            String username,
+            String password,
+            UserRole role) {
+
+        AppUser user = AppUser.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .role(role.name())
+                .build();
+
+        return userRepository.save(user);
+    }
+
+    private String loginAndGetToken(
+            String username,
+            String password
+    ) throws Exception {
+
+        LoginRequest request =
+                new LoginRequest(username, password);
+
+        String response =
+                mockMvc.perform(post("/api/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        return objectMapper.readTree(response)
+                .get("token")
+                .asText();
+    }
+
+    private Client createClient(
+            String name,
+            String email,
+            AppUser owner
+    ) {
+
+        Client client = Client.builder()
+                .name(name)
+                .email(email)
+                .phone("0102030405")
+                .address("1 rue des test")
+                .user(owner)
+                .build();
+
+        return clientRepository.save(client);
     }
 
 }
