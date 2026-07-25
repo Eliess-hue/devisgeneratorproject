@@ -314,12 +314,14 @@ export default function QuoteDetailPage() {
             <QuoteLineModal
                 isOpen={isLineModalOpen}
                 onClose={() => {
-
                     resetLineForm()
-
                     setIsLineModalOpen(false)
-
                 }}
+                title={
+                    editingLine
+                        ? "Modifier la ligne"
+                        : "Ajouter une ligne"
+                }
             >
 
                 <QuoteLineForm

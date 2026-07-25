@@ -1,6 +1,7 @@
 export default function QuoteLineModal({
                                            isOpen,
                                            onClose,
+                                           title,
                                            children
                                        }) {
 
@@ -32,8 +33,8 @@ export default function QuoteLineModal({
 
                 <div className="flex justify-between mb-4">
 
-                    <h2 className="text-xl font-bold">
-                        Nouvelle ligne
+                    <h2 className="text-xl font-semibold">
+                        {title}
                     </h2>
 
                     <button
