@@ -171,10 +171,7 @@ class UserControllerIntegrationTest {
 
         AppUser updated = appUserRepository.findById(target.getId()).orElseThrow();
 
-        assertEquals(
-                UserRole.ROLE_ADMIN.name(),
-                updated.getRole()
-        );
+        assertEquals(UserRole.ROLE_ADMIN, updated.getRole());
     }
 
     @Test
@@ -206,7 +203,7 @@ class UserControllerIntegrationTest {
         AppUser user = AppUser.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
-                .role(role.name())
+                .role(role)
                 .build();
 
         return appUserRepository.save(user);

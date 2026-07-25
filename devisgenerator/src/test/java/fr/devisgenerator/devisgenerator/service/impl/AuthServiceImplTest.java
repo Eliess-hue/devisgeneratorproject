@@ -8,6 +8,7 @@ import fr.devisgenerator.devisgenerator.exception.InvalidCredentialsException;
 import fr.devisgenerator.devisgenerator.exception.UserAlreadyExistsException;
 import fr.devisgenerator.devisgenerator.repository.AppUserRepository;
 import fr.devisgenerator.devisgenerator.security.JwtService;
+import fr.devisgenerator.devisgenerator.enums.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -64,7 +65,7 @@ class AuthServiceImplTest {
                 .id(1L)
                 .username("johnny")
                 .password("encoded-password")
-                .role("ROLE_USER")
+                .role(UserRole.ROLE_USER)
                 .build();
 
         when(userRepository.findByUsername(request.username()))
@@ -128,7 +129,7 @@ class AuthServiceImplTest {
                 .id(1L)
                 .username("johnny")
                 .password("encoded-password")
-                .role("ROLE_USER")
+                .role(UserRole.ROLE_USER)
                 .build();
 
         when(userRepository.findByUsername("johnny"))
@@ -186,7 +187,7 @@ class AuthServiceImplTest {
                 .id(1L)
                 .username("johnny")
                 .password("encoded-password")
-                .role("ROLE_USER")
+                .role(UserRole.ROLE_USER)
                 .build();
 
         when(userRepository.findByUsername("johnny"))

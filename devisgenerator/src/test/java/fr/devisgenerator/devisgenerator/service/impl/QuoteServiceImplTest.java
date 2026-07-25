@@ -13,6 +13,7 @@ import fr.devisgenerator.devisgenerator.repository.ClientRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteLineRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteRepository;
 import fr.devisgenerator.devisgenerator.dto.request.QuoteFilterRequest;
+import fr.devisgenerator.devisgenerator.enums.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -55,7 +56,7 @@ class QuoteServiceImplTest {
         AppUser user = AppUser.builder()
                 .id(1L)
                 .username("john")
-                .role("ROLE_USER")
+                .role(UserRole.ROLE_USER)
                 .build();
 
         Client client = Client.builder()
@@ -412,7 +413,7 @@ class QuoteServiceImplTest {
         AppUser user = AppUser.builder()
                 .id(1L)
                 .username("john")
-                .role("ROLE_USER")
+                .role(UserRole.ROLE_USER)
                 .build();
 
         Client client = Client.builder()

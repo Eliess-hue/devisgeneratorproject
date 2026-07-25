@@ -792,7 +792,7 @@ class QuoteControllerIntegrationTest {
         AppUser user = AppUser.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
-                .role(role.name())
+                .role(role)
                 .build();
 
         return userRepository.save(user);

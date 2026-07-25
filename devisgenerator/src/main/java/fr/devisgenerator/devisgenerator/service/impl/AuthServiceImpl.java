@@ -4,11 +4,12 @@ import fr.devisgenerator.devisgenerator.dto.request.LoginRequest;
 import fr.devisgenerator.devisgenerator.dto.request.RegisterRequest;
 import fr.devisgenerator.devisgenerator.dto.response.AuthResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
+import fr.devisgenerator.devisgenerator.enums.UserRole;
 import fr.devisgenerator.devisgenerator.exception.InvalidCredentialsException;
 import fr.devisgenerator.devisgenerator.exception.UserAlreadyExistsException;
 import fr.devisgenerator.devisgenerator.repository.AppUserRepository;
-import fr.devisgenerator.devisgenerator.service.AuthService;
 import fr.devisgenerator.devisgenerator.security.JwtService;
+import fr.devisgenerator.devisgenerator.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,12 +37,11 @@ public class AuthServiceImpl implements AuthService {
         AppUser user = AppUser.builder()
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
-                .role("ROLE_USER")
+                .role(UserRole.ROLE_USER)
                 .build();
 
         // 3. sauvegarder
         userRepository.save(user);
-
     }
 
     @Override
