@@ -11,7 +11,7 @@ export default function QuoteHeader({
 
     return (
 
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
 
             <div className="space-y-3">
 
@@ -27,7 +27,7 @@ export default function QuoteHeader({
 
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3 md:flex-nowrap">
 
                 <button
                     className="

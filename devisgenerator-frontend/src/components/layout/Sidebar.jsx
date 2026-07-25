@@ -1,12 +1,22 @@
-import {NavLink} from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
 import UserProfile from './UserProfile'
 
 export default function Sidebar() {
 
+    const closeDrawer = () => {
+
+        const drawer = document.getElementById('drawer-toggle');
+
+        if (drawer) {
+            drawer.checked = false;
+        }
+
+    };
+
     return (
 
-        <aside className="w-64 bg-base-200 border-r border-base-300 flex flex-col">
+        <aside className="w-64 min-h-full bg-base-200 border-r border-base-300 flex flex-col">
 
             {/* Logo */}
             <div className="p-6 flex items-center gap-3">
@@ -24,6 +34,7 @@ export default function Sidebar() {
 
                 <NavLink
                     to="/dashboard"
+                    onClick={closeDrawer}
                     className={({ isActive }) =>
                         `block px-4 py-3 rounded-lg mb-2 ${
                             isActive
@@ -37,6 +48,7 @@ export default function Sidebar() {
 
                 <NavLink
                     to="/clients"
+                    onClick={closeDrawer}
                     className={({ isActive }) =>
                         `block px-4 py-3 rounded-lg mb-2 ${
                             isActive
@@ -50,6 +62,7 @@ export default function Sidebar() {
 
                 <NavLink
                     to="/quotes"
+                    onClick={closeDrawer}
                     className={({ isActive }) =>
                         `block px-4 py-3 rounded-lg ${
                             isActive
