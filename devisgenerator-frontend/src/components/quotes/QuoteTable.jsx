@@ -107,47 +107,37 @@ export default function QuoteTable({
 
                                     <td>
 
-                                        <button
-                                            className="btn btn-xs bg-blue-900 text-blue-400 border-none hover:bg-blue-800 rounded-lg"
-                                            onClick={() =>
-                                                onEdit(
-                                                    quote
-                                                )
-                                            }
-                                        >
-                                            Modifier
-                                        </button>
+                                        <div className="flex items-center gap-2 whitespace-nowrap">
 
-                                        |
+                                            <button
+                                                className="btn btn-xs bg-blue-900 text-blue-400 border-none hover:bg-blue-800 rounded-lg"
+                                                onClick={() => onEdit(quote)}
+                                            >
+                                                Modifier
+                                            </button>
 
-                                        <button
-                                            className="btn btn-xs bg-base-300 text-base-content border-none hover:bg-base-100 rounded-lg"
-                                            onClick={() => onDuplicate(quote.id)}
-                                        >
-                                            Dupliquer
-                                        </button>
+                                            <button
+                                                className="btn btn-xs bg-base-300 text-base-content border-none hover:bg-base-100 rounded-lg"
+                                                onClick={() => onDuplicate(quote.id)}
+                                            >
+                                                Dupliquer
+                                            </button>
 
-                                        |
+                                            <button
+                                                className="btn btn-xs bg-red-950 text-red-300 border-none hover:bg-red-900 rounded-lg"
+                                                onClick={() => onDelete(quote.id)}
+                                            >
+                                                Supprimer
+                                            </button>
 
-                                        <button
-                                            className="btn btn-xs bg-red-950 text-red-300 border-none hover:bg-red-900 rounded-lg"
-                                            onClick={() =>
-                                                onDelete(
-                                                    quote.id
-                                                )
-                                            }
-                                        >
-                                            Supprimer
-                                        </button>
+                                            <button
+                                                className="btn btn-xs bg-base-300 text-base-content border-none hover:bg-base-100 rounded-lg"
+                                                onClick={() => navigate(`/quotes/${quote.id}`)}
+                                            >
+                                                Voir
+                                            </button>
 
-                                        |
-
-                                        <button
-                                            className="btn btn-xs bg-base-300 text-base-content border-none hover:bg-base-100 rounded-lg"
-                                            onClick={() => navigate(`/quotes/${quote.id}`)}
-                                        >
-                                            Voir
-                                        </button>
+                                        </div>
 
                                     </td>
 

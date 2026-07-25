@@ -83,7 +83,7 @@ export default function QuoteLinesTable({
 
                                     <td>
 
-                                        <div className="flex gap-2">
+                                        <div className="flex items-center gap-2 whitespace-nowrap">
 
                                             <button
                                                 className="btn btn-xs bg-blue-900 text-blue-400 border-none hover:bg-blue-800 rounded-lg"
@@ -91,8 +91,6 @@ export default function QuoteLinesTable({
                                             >
                                                 Modifier
                                             </button>
-
-                                            |
 
                                             <button
                                                 className="btn btn-xs bg-red-950 text-red-300 border-none hover:bg-red-900 rounded-lg"

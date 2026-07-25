@@ -67,34 +67,36 @@ export default function DashboardRecentQuotesTable({quotes}) {
                                 </td>
 
                                 <td>
-                                    <button
-                                        className="btn btn-xs bg-base-300 text-base-content border-none hover:bg-base-100 rounded-lg"
-                                        onClick={() =>
-                                            navigate(
-                                                `/quotes/${quote.id}`
-                                            )
-                                        }
-                                    >
-                                        Voir
-                                    </button>
 
-                                    |
+                                    <div className="flex items-center gap-2 whitespace-nowrap">
 
-                                    <button
-                                        className="btn btn-xs bg-blue-900 text-blue-400 border-none hover:bg-blue-800 rounded-lg"
-                                        disabled
-                                    >
-                                        Modifier
-                                    </button>
+                                        <button
+                                            className="btn btn-xs bg-base-300 text-base-content border-none hover:bg-base-100 rounded-lg"
+                                            onClick={() =>
+                                                navigate(
+                                                    `/quotes/${quote.id}`
+                                                )
+                                            }
+                                        >
+                                            Voir
+                                        </button>
 
-                                    |
+                                        <button
+                                            className="btn btn-xs bg-blue-900 text-blue-400 border-none hover:bg-blue-800 rounded-lg"
+                                            disabled
+                                        >
+                                            Modifier
+                                        </button>
 
-                                    <button
-                                        className="btn btn-xs btn-primary rounded-lg"
-                                        onClick={() => openPdf(quote.id)}
-                                    >
-                                        PDF
-                                    </button>
+                                        <button
+                                            className="btn btn-xs btn-primary rounded-lg"
+                                            onClick={() => openPdf(quote.id)}
+                                        >
+                                            PDF
+                                        </button>
+
+                                    </div>
+
                                 </td>
 
                             </tr>
