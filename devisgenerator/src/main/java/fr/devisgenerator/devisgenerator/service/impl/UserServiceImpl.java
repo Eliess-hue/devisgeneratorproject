@@ -38,9 +38,9 @@ public class UserServiceImpl implements UserService {
                         )
                 );
 
-        String previousRole = user.getRole();
+        UserRole previousRole = user.getRole();
 
-        user.setRole(role.name());
+        user.setRole(role);
 
         user = userRepository.save(user);
 

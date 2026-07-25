@@ -127,7 +127,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     private boolean isAdmin(AppUser user) {
-        return UserRole.ROLE_ADMIN.name().equals(user.getRole());
+        return user.getRole() == UserRole.ROLE_ADMIN;
     }
 
     private Client getAccessibleClient(Long id, AppUser user) {

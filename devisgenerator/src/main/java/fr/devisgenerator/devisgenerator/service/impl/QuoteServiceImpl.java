@@ -187,7 +187,7 @@ public class QuoteServiceImpl implements QuoteService {
     }
 
     private boolean isAdmin(AppUser user) {
-        return UserRole.ROLE_ADMIN.name().equals(user.getRole());
+        return user.getRole() == UserRole.ROLE_ADMIN;
     }
 
     @Override
