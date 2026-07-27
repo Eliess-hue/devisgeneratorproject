@@ -1,50 +1,107 @@
-import { createContext, useContext, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState
+} from "react"
+
+import {getMe} from "../api/apiAuth.js"
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
 
+    const [id, setId] = useState(null)
+
     const [token, setToken] = useState(
-        localStorage.getItem('token') || null
-    )
-    const [username, setUsername] = useState(
-        localStorage.getItem('username') || null
+        localStorage.getItem("token") || null
     )
 
+    const [username, setUsername] = useState(null)
+
+    const [role, setRole] = useState(null)
+
+    const [isLoading, setIsLoading] = useState(true)
+
     const saveAuth = (
+        newId,
         newToken,
-        newUsername
+        newUsername,
+        newRole
     ) => {
 
         localStorage.setItem(
-            'token',
+            "token",
             newToken
         )
 
-        localStorage.setItem(
-            'username',
-            newUsername
-        )
-
+        setId(newId)
         setToken(newToken)
         setUsername(newUsername)
+        setRole(newRole)
 
     }
 
     const logout = () => {
 
-        localStorage.removeItem('token')
-        localStorage.removeItem('username')
+        localStorage.removeItem("token")
 
+        setId(null)
         setToken(null)
         setUsername(null)
+        setRole(null)
 
     }
 
+    useEffect(() => {
+
+        if (!token) {
+
+            setIsLoading(false)
+
+            return
+
+        }
+
+        getMe(token)
+            .then(response => {
+
+                setId(response.data.id)
+                setUsername(response.data.username)
+                setRole(response.data.role)
+
+            })
+            .catch(() => {
+
+                logout()
+
+            })
+            .finally(() => {
+
+                setIsLoading(false)
+
+            })
+
+    }, [])
+
     return (
-        <AuthContext.Provider value={{ token, username, saveAuth, logout }}>
+
+        <AuthContext.Provider
+            value={{
+                id,
+                token,
+                username,
+                role,
+                isLoading,
+                saveAuth,
+                logout
+            }}
+        >
+
             {children}
+
         </AuthContext.Provider>
+
     )
 
 }

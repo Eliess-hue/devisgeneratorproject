@@ -1,8 +1,10 @@
 import { NavLink } from 'react-router-dom'
-
 import UserProfile from './UserProfile'
+import {useAuth} from "../../context/AuthContext.jsx"
 
 export default function Sidebar() {
+
+    const { role } = useAuth()
 
     const closeDrawer = () => {
 
@@ -12,7 +14,17 @@ export default function Sidebar() {
             drawer.checked = false;
         }
 
-    };
+    }
+
+    const navLinkClass = ({ isActive }) =>
+        `
+            flex items-center px-4 py-3 rounded-lg transition-colors
+            ${
+            isActive
+                ? "bg-primary text-primary-content"
+                : "hover:bg-base-300"
+        }
+        `;
 
     return (
 
@@ -35,13 +47,7 @@ export default function Sidebar() {
                 <NavLink
                     to="/dashboard"
                     onClick={closeDrawer}
-                    className={({ isActive }) =>
-                        `block px-4 py-3 rounded-lg mb-2 ${
-                            isActive
-                                ? 'bg-primary text-primary-content'
-                                : 'hover:bg-base-300'
-                        }`
-                    }
+                    className={navLinkClass}
                 >
                     Dashboard
                 </NavLink>
@@ -49,13 +55,7 @@ export default function Sidebar() {
                 <NavLink
                     to="/clients"
                     onClick={closeDrawer}
-                    className={({ isActive }) =>
-                        `block px-4 py-3 rounded-lg mb-2 ${
-                            isActive
-                                ? 'bg-primary text-primary-content'
-                                : 'hover:bg-base-300'
-                        }`
-                    }
+                    className={navLinkClass}
                 >
                     Clients
                 </NavLink>
@@ -63,16 +63,22 @@ export default function Sidebar() {
                 <NavLink
                     to="/quotes"
                     onClick={closeDrawer}
-                    className={({ isActive }) =>
-                        `block px-4 py-3 rounded-lg ${
-                            isActive
-                                ? 'bg-primary text-primary-content'
-                                : 'hover:bg-base-300'
-                        }`
-                    }
+                    className={navLinkClass}
                 >
                     Devis
                 </NavLink>
+
+                {role === "ROLE_ADMIN" && (
+
+                    <NavLink
+                        to="/users"
+                        onClick={closeDrawer}
+                        className={navLinkClass}
+                    >
+                        Utilisateurs
+                    </NavLink>
+
+                )}
 
             </nav>
 
