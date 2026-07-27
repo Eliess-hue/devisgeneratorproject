@@ -55,6 +55,13 @@ public class UserServiceImpl implements UserService {
         return toAppUserResponse(user);
     }
 
+    @Override
+    public AppUserResponse me(AppUser user) {
+
+        return toAppUserResponse(user);
+
+    }
+
     private AppUserResponse toAppUserResponse(AppUser user) {
 
         return new AppUserResponse(

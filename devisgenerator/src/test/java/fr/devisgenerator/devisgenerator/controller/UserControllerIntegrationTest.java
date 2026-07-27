@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -196,6 +197,70 @@ class UserControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void meShouldReturn401WithoutJwt() throws Exception {
+
+        mockMvc.perform(get("/api/users/me"))
+                .andExpect(status().isUnauthorized());
+
+    }
+
+    @Test
+    void meShouldReturnCurrentUserInfoForUser() throws Exception {
+
+        AppUser user = createUser(
+                "user",
+                "password",
+                UserRole.ROLE_USER
+        );
+
+        String token = loginAndGetToken(
+                "user",
+                "password"
+        );
+
+        mockMvc.perform(
+                        get("/api/users/me")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + token
+                                )
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(user.getId()))
+                .andExpect(jsonPath("$.username").value("user"))
+                .andExpect(jsonPath("$.role").value("ROLE_USER"));
+
+    }
+
+    @Test
+    void meShouldReturnCurrentUserInfoForAdmin() throws Exception {
+
+        AppUser admin = createUser(
+                "august",
+                "password",
+                UserRole.ROLE_ADMIN
+        );
+
+        String token = loginAndGetToken(
+                "august",
+                "password"
+        );
+
+        mockMvc.perform(
+                        get("/api/users/me")
+                                .header(
+                                        HttpHeaders.AUTHORIZATION,
+                                        "Bearer " + token
+                                )
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(admin.getId()))
+                .andExpect(jsonPath("$.username").value("august"))
+                .andExpect(jsonPath("$.role").value("ROLE_ADMIN"));
+
     }
 
     private AppUser createUser(String username, String password, UserRole role) {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { login } from '../api/apiAuth.js'
+import {getMe, login} from '../api/apiAuth.js'
 import Alert from "../components/common/Alert.jsx"
 
 export default function LoginPage() {
@@ -91,10 +91,18 @@ export default function LoginPage() {
         setError(null)
 
         try {
-            const response = await login(username, password)
+            const response = await login(username, password);
 
-            saveAuth(response.data.token,
-                username)
+            const token = response.data.token;
+
+            const meResponse = await getMe(token);
+
+            saveAuth(
+                meResponse.data.id,
+                token,
+                meResponse.data.username,
+                meResponse.data.role
+            );
 
             navigate('/dashboard')
 

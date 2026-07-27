@@ -11,3 +11,13 @@ export const register = (username, password) =>
         username,
         password
     })
+
+export const getMe = (token) =>
+    axiosConfig.get(
+        "/api/users/me",
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    )
