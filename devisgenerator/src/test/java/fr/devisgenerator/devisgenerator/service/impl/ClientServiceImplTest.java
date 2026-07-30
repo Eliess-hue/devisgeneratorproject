@@ -1,5 +1,6 @@
 package fr.devisgenerator.devisgenerator.service.impl;
 
+import fr.devisgenerator.devisgenerator.dto.request.ClientFilterRequest;
 import fr.devisgenerator.devisgenerator.dto.request.ClientRequest;
 import fr.devisgenerator.devisgenerator.dto.response.ClientResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
@@ -13,13 +14,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -71,7 +76,7 @@ class ClientServiceImplTest {
     }
 
     @Test
-    void findAllShouldReturnClientsOfUser() {
+    void searchShouldReturnFilteredClients() {
 
         // Arrange
         AppUser user = AppUser.builder()
@@ -85,20 +90,67 @@ class ClientServiceImplTest {
                 .user(user)
                 .build();
 
-        when(clientRepository.findByUser_Id(1L))
-                .thenReturn(List.of(client));
+        ClientFilterRequest filter =
+                new ClientFilterRequest("ACME");
 
-        // Le client a l'id 1L, 3 devis, dernier = "DEV-2024-003"
-        mockQuoteInformations(1L, 3, "DEV-2024-003");
+        Pageable pageable =
+                PageRequest.of(0, 10);
+
+        Page<Client> page =
+                new PageImpl<>(
+                        List.of(client),
+                        pageable,
+                        1
+                );
+
+        when(clientRepository.findAll(
+                any(Specification.class),
+                any(Pageable.class)
+        )).thenReturn(page);
+
+        mockQuoteInformations(
+                1L,
+                3,
+                "DEV-2024-003"
+        );
 
         // Act
-        List<ClientResponse> responses = clientService.findAll(user);
+        Page<ClientResponse> responses =
+                clientService.search(
+                        filter,
+                        pageable,
+                        user
+                );
 
         // Assert
-        assertEquals(1, responses.size());
-        assertEquals("ACME", responses.get(0).name());
-        assertEquals(3, responses.get(0).quoteCount());
-        assertEquals("DEV-2024-003", responses.get(0).lastQuoteNumber());
+        assertEquals(
+                1,
+                responses.getTotalElements()
+        );
+
+        ClientResponse response =
+                responses.getContent().getFirst();
+
+        assertAll(
+                () -> assertEquals(
+                        "ACME",
+                        response.name()
+                ),
+                () -> assertEquals(
+                        3,
+                        response.quoteCount()
+                ),
+                () -> assertEquals(
+                        "DEV-2024-003",
+                        response.lastQuoteNumber()
+                )
+        );
+
+        verify(clientRepository)
+                .findAll(
+                        any(Specification.class),
+                        any(Pageable.class)
+                );
     }
 
     @Test

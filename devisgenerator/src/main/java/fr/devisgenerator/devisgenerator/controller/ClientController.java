@@ -1,6 +1,8 @@
 package fr.devisgenerator.devisgenerator.controller;
 
 import fr.devisgenerator.devisgenerator.dto.request.ClientRequest;
+import fr.devisgenerator.devisgenerator.dto.request.ClientFilterRequest;
+import fr.devisgenerator.devisgenerator.dto.response.PageResponse;
 import fr.devisgenerator.devisgenerator.dto.response.ClientResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
 import fr.devisgenerator.devisgenerator.service.ClientService;
@@ -8,14 +10,13 @@ import fr.devisgenerator.devisgenerator.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.util.List;
 
 @Tag(
         name = "Clients",
@@ -42,14 +43,24 @@ public class ClientController {
     }
 
     @Operation(
-            summary = "Lister les clients",
-            description = "Retourne tous les clients de l'utilisateur connecté"
+            summary = "Filtrer les clients",
+            description = "Retourne une page de clients correspondant aux critères de recherche : nom du client."
     )
-    @GetMapping
-    public List<ClientResponse> findAll(
-            @AuthenticationPrincipal AppUser user) {
+    @GetMapping("/search")
+    public PageResponse<ClientResponse> search(
+            @ModelAttribute ClientFilterRequest filter,
+            Pageable pageable,
+            @AuthenticationPrincipal AppUser user
+    ) {
 
-        return clientService.findAll(user);
+        return PageResponse.from(
+                clientService.search(
+                        filter,
+                        pageable,
+                        user
+                )
+        );
+
     }
 
     @Operation(

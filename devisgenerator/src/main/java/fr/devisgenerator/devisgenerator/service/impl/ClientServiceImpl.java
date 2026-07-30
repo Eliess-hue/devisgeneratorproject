@@ -1,5 +1,6 @@
 package fr.devisgenerator.devisgenerator.service.impl;
 
+import fr.devisgenerator.devisgenerator.dto.request.ClientFilterRequest;
 import fr.devisgenerator.devisgenerator.dto.request.ClientRequest;
 import fr.devisgenerator.devisgenerator.dto.response.ClientResponse;
 import fr.devisgenerator.devisgenerator.entity.AppUser;
@@ -11,12 +12,14 @@ import fr.devisgenerator.devisgenerator.repository.ClientRepository;
 import fr.devisgenerator.devisgenerator.repository.QuoteRepository;
 import fr.devisgenerator.devisgenerator.service.ClientService;
 
+import fr.devisgenerator.devisgenerator.specification.ClientSpecification;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,24 +49,30 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public List<ClientResponse> findAll(AppUser user) {
+    public Page<ClientResponse> search(ClientFilterRequest filter, Pageable pageable, AppUser user
+    ) {
 
-        // récupérer tous les clients du propriétaire connecté
-        // et en tant qu'administrateur
-        List<Client> clients;
+        Specification<Client> spec =
+                Specification.allOf(
+                        ClientSpecification.hasSearch(
+                                filter.search()
+                        )
+                );
 
-        if (isAdmin(user)) {
-            clients = clientRepository.findAll();
-        } else {
-            clients = clientRepository.findByUser_Id(user.getId());
+        if (!isAdmin(user)) {
+            spec = spec.and(
+                    ClientSpecification.hasUser(
+                            user.getId()
+                    )
+            );
         }
 
-        // convertir et retourner chaque Client en ClientResponse
-        return clients.stream()
-                .map(this::toClientResponse)
-                .toList();
+        return clientRepository
+                .findAll(spec, pageable)
+                .map(this::toClientResponse);
 
     }
+
 
     @Override
     public ClientResponse findById(Long id, AppUser user) {

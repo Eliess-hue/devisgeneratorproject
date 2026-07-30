@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import useClients from "../hooks/useClients.js";
 
+import Pagination from "../components/common/Pagination.jsx"
 import ClientModal from '../components/clients/ClientModal.jsx'
 import ClientTable from '../components/clients/ClientTable.jsx'
 import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
@@ -26,19 +27,25 @@ export default function ClientsPage() {
     const {
         clients,
         loading,
+        isSearching,
         error,
-        clearError,
+        totalPages,
+        totalElements,
+        loadClients,
         saveClient,
         removeClient
-    } = useClients();
+    } = useClients()
 
-    const filteredClients = clients.filter(
-        client =>
-            (client.name || '')
-                .toLowerCase()
-                .includes(search.toLowerCase())
-    )
+    const [page, setPage] = useState(0)
 
+    const refresh = () =>
+        loadClients({
+
+            search,
+            page,
+            size: 10
+
+        })
 
     const handleNewClient = () => {
 
@@ -80,6 +87,8 @@ export default function ClientsPage() {
 
             });
 
+            await refresh();
+
             closeModal();
 
         } catch (err) {
@@ -103,6 +112,8 @@ export default function ClientsPage() {
         try {
 
             await removeClient(clientToDelete);
+
+            await refresh();
 
             closeDeleteModal();
 
@@ -134,6 +145,24 @@ export default function ClientsPage() {
         setAddress('')
 
     }
+
+    useEffect(() => {
+
+        setPage(0)
+
+    }, [search])
+
+    useEffect(() => {
+
+        const timer = setTimeout(() => {
+
+            refresh()
+
+        }, 300)
+
+        return () => clearTimeout(timer)
+
+    }, [search, page])
 
     if (loading) {
         return <ClientsPageSkeleton />
@@ -211,9 +240,17 @@ export default function ClientsPage() {
                 />
 
                 <ClientTable
-                    clients={filteredClients}
+                    clients={clients}
                     onEdit={handleEditClient}
                     onDelete={handleDeleteClient}
+                />
+
+                <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    onPageChange={setPage}
+                    label="clients"
                 />
 
             </div>

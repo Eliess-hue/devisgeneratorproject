@@ -1,7 +1,20 @@
 import axiosConfig from './axiosConfig.js'
 
-export const getClients = () =>
-    axiosConfig.get('/api/clients')
+export const searchClients = (filters) => {
+
+    const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(
+            ([, value]) =>
+                value !== null &&
+                value !== undefined &&
+                value !== ''
+        )
+    )
+
+    return axiosConfig.get("/api/clients/search", {
+        params: cleanFilters
+    })
+}
 
 export const createClient = (client) =>
     axiosConfig.post('/api/clients', client)
