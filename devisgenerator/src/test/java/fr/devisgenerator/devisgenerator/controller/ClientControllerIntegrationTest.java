@@ -101,12 +101,12 @@ class ClientControllerIntegrationTest {
     }
 
     @Test
-    void findAllShouldReturn200() throws Exception {
+    void searchShouldReturn200() throws Exception {
 
         String token = getToken();
 
         mockMvc.perform(
-                        get("/api/clients")
+                        get("/api/clients/search")
                                 .header(
                                         "Authorization",
                                         "Bearer " + token
@@ -116,11 +116,12 @@ class ClientControllerIntegrationTest {
     }
 
     @Test
-    void findAllShouldReturn401WithoutToken() throws Exception {
+    void searchShouldReturn401WithoutToken()
+            throws Exception {
 
         mockMvc.perform(
-                get("/api/clients")
-        )
+                        get("/api/clients/search")
+                )
                 .andExpect(status().isUnauthorized());
     }
 
@@ -284,7 +285,7 @@ class ClientControllerIntegrationTest {
     }
 
     @Test
-    void findAllShouldReturnAllClientsForAdmin() throws Exception {
+    void searchShouldReturnAllClientsForAdmin()throws Exception {
 
         AppUser user1 = createUser(
                 "client-user-1",
@@ -321,7 +322,7 @@ class ClientControllerIntegrationTest {
                 "password123"
         );
 
-        mockMvc.perform(get("/api/clients")
+        mockMvc.perform(get("/api/clients/search")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Alice")))
@@ -329,7 +330,7 @@ class ClientControllerIntegrationTest {
     }
 
     @Test
-    void findAllShouldReturnOnlyOwnedClientsForUser() throws Exception {
+    void searchShouldReturnOnlyOwnedClientsForUser() throws Exception {
 
         AppUser user1 = createUser(
                 "client-owner",
@@ -360,11 +361,92 @@ class ClientControllerIntegrationTest {
                 "password123"
         );
 
-        mockMvc.perform(get("/api/clients")
+        mockMvc.perform(get("/api/clients/search")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].name").value("Alice"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Alice"));
+    }
+
+    @Test
+    void searchShouldFilterClientsBySearchTerm()
+            throws Exception {
+
+        AppUser owner = createUser(
+                "search-owner",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        createClient(
+                "Alice Martin",
+                "alice@test.fr",
+                owner
+        );
+
+        createClient(
+                "Bob Dupont",
+                "bob@test.fr",
+                owner
+        );
+
+        String token =
+                loginAndGetToken(
+                        "search-owner",
+                        "password123"
+                );
+
+        mockMvc.perform(
+                        get("/api/clients/search")
+                                .param("search", "Alice")
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + token
+                                )
+                )
+                .andExpect(status().isOk())
+                .andExpect(
+                        jsonPath("$.content.length()")
+                                .value(1)
+                )
+                .andExpect(
+                        jsonPath("$.content[0].name")
+                                .value("Alice Martin")
+                );
+    }
+
+    @Test
+    void searchShouldRespectPagination() throws Exception {
+
+        AppUser user = createUser(
+                "pagination-user",
+                "password123",
+                UserRole.ROLE_USER
+        );
+
+        createClient("Alice", "alice@test.fr", user);
+        createClient("Bob", "bob@test.fr", user);
+        createClient("Charlie", "charlie@test.fr", user);
+
+        String token = loginAndGetToken(
+                "pagination-user",
+                "password123"
+        );
+
+        mockMvc.perform(
+                        get("/api/clients/search")
+                                .param("page", "0")
+                                .param("size", "2")
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + token
+                                )
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(2))
+                .andExpect(jsonPath("$.size").value(2))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.totalElements").value(3));
     }
 
     private String getToken() throws Exception {

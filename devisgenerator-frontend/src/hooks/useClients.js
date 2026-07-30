@@ -1,7 +1,7 @@
-import {useState, useEffect} from "react"
+import {useState} from "react"
 
 import {
-    getClients,
+    searchClients,
     createClient,
     updateClient,
     deleteClient
@@ -11,74 +11,72 @@ export default function useClients() {
 
     const [clients, setClients] = useState([])
     const [loading, setLoading] = useState(true)
+    const [isSearching, setIsSearching] = useState(false)
     const [error, setError] = useState(null)
 
-    const loadClients = async () => {
+    const [totalPages, setTotalPages] = useState(0)
+    const [totalElements, setTotalElements] = useState(0)
 
-        setLoading(true);
+    const loadClients = async (filters) => {
+
+        if (!loading) {
+            setIsSearching(true)
+        }
 
         try {
 
-            const response = await getClients();
+            const response = await searchClients(filters)
 
-            setClients(response.data);
-            setError(null);
+            setClients(response.data.content)
+            setTotalPages(response.data.totalPages)
+            setTotalElements(response.data.totalElements)
+
+            setError(null)
 
         } catch (err) {
 
-            console.error(err);
+            console.error(err)
 
             setError(
                 err.response?.data ??
                 "Impossible de charger les clients"
-            );
+            )
 
         } finally {
 
-            setLoading(false);
+            setLoading(false)
+            setIsSearching(false)
 
         }
 
     }
 
-    const saveClient = async ({ id, name, email, phone, address }) => {
+    const saveClient = async (client) => {
 
         try {
 
-            if (id) {
+            if (client.id) {
 
-                await updateClient(id, {
-                    name,
-                    email,
-                    phone,
-                    address
-                });
+                await updateClient(client.id, client)
 
             } else {
 
-                await createClient({
-                    name,
-                    email,
-                    phone,
-                    address
-                });
+                await createClient(client)
 
             }
 
-            await loadClients();
-
-            setError(null);
+            setError(null)
 
         } catch (err) {
 
-            console.error(err);
+            console.error(err)
 
             setError(
                 err.response?.data ??
                 "Impossible d'enregistrer le client"
-            );
+            )
 
-            throw err;
+            throw err
 
         }
 
@@ -88,19 +86,19 @@ export default function useClients() {
 
         try {
 
-            await deleteClient(id);
+            await deleteClient(id)
 
-            await loadClients();
+            setError(null)
 
         } catch (err) {
 
-            console.error(err);
+            console.error(err)
 
             setError(
                 "Impossible de supprimer le client"
-            );
+            )
 
-            throw err;
+            throw err
 
         }
 
@@ -108,24 +106,25 @@ export default function useClients() {
 
     const clearError = () => {
 
-        setError(null);
+        setError(null)
 
     }
 
-    useEffect(() => {
-
-        loadClients();
-
-    }, []);
-
     return {
+
         clients,
         loading,
+        isSearching,
         error,
-        clearError,
+
+        totalPages,
+        totalElements,
+
         loadClients,
         saveClient,
-        removeClient
-    };
+        removeClient,
+        clearError
+
+    }
 
 }

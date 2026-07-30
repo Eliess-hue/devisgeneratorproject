@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react"
 import useQuotes from "../hooks/useQuotes"
 
-import {getClients} from "../api/apiClient.js"
+import {searchClients} from "../api/apiClient.js"
 import QuoteModal from "../components/quotes/QuoteModal.jsx"
 import QuoteTable from "../components/quotes/QuoteTable.jsx"
 import ConfirmationModal from "../components/common/ConfirmationModal.jsx"
@@ -90,9 +90,12 @@ export default function QuotesPage() {
 
         try {
 
-            const response = await getClients()
+            const response = await searchClients({
+                page: 0,
+                size: 1000
+            })
 
-            setClients(response.data)
+            setClients(response.data.content)
 
         } catch (err) {
 
@@ -329,6 +332,7 @@ export default function QuotesPage() {
                     page={page}
                     totalPages={totalPages}
                     totalElements={totalElements}
+                    label="devis"
                     onPageChange={setPage}
                 />
 

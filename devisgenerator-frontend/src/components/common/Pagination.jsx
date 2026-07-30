@@ -2,6 +2,7 @@ export default function Pagination({
                                        page,
                                        totalPages,
                                        totalElements,
+                                       label = "element",
                                        onPageChange
                                    }) {
 
@@ -14,7 +15,7 @@ export default function Pagination({
         <div className="flex items-center justify-between mt-6">
 
     <span className="text-sm text-base-content/60">
-        {totalElements} devis
+        {totalElements} {label}
     </span>
 
             <div className="flex items-center gap-4">

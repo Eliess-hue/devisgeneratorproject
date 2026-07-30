@@ -2,11 +2,9 @@ package fr.devisgenerator.devisgenerator.repository;
 
 import fr.devisgenerator.devisgenerator.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
-
-public interface ClientRepository extends JpaRepository<Client, Long> {
-
-    List<Client> findByUser_Id(Long userId);
+public interface ClientRepository extends JpaRepository<Client, Long>,
+        JpaSpecificationExecutor<Client> {
 
 }
