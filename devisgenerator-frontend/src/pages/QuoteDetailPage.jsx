@@ -29,6 +29,7 @@ export default function QuoteDetailPage() {
         error,
         saveLine,
         removeLine,
+        updateStatus,
         duplicate
     } = useQuoteDetail(id)
 
@@ -227,6 +228,20 @@ export default function QuoteDetailPage() {
 
     }
 
+    const handleStatusChange = async (newStatus) => {
+
+        try {
+
+            await updateStatus(newStatus);
+
+        } catch (err) {
+
+            console.error(err);
+
+        }
+
+    };
+
     const closeDeleteModal = () => {
 
         setIsDeleteModalOpen(false)
@@ -307,6 +322,7 @@ export default function QuoteDetailPage() {
 
                 <QuoteInfoCard
                     quote={quote}
+                    onStatusChange={handleStatusChange}
                 />
 
             </div>

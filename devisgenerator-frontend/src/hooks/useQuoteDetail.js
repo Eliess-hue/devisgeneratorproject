@@ -5,7 +5,8 @@ import {
     addQuoteLine,
     updateQuoteLine,
     deleteQuoteLine,
-    duplicateQuote
+    duplicateQuote,
+    updateQuote
 } from "../api/apiQuote";
 
 export default function useQuoteDetail(id) {
@@ -150,6 +151,34 @@ export default function useQuoteDetail(id) {
 
     };
 
+    const updateStatus = async (newStatus) => {
+
+        try {
+
+            await updateQuote(
+                id,
+                quote.client.id,
+                newStatus
+            );
+
+            await loadQuote();
+
+            setError(null);
+
+        } catch (err) {
+
+            console.error(err);
+
+            setError(
+                "Impossible de modifier le statut"
+            );
+
+            throw err;
+
+        }
+
+    };
+
     const clearError = () => {
 
         setError(null);
@@ -171,6 +200,7 @@ export default function useQuoteDetail(id) {
         loadQuote,
         saveLine,
         removeLine,
+        updateStatus,
         duplicate,
         clearError
 

@@ -1,8 +1,4 @@
-import QuoteStatusBadge from './QuoteStatusBadge.jsx'
-
-export default function QuoteInfoCard({
-                                          quote
-                                      }) {
+export default function QuoteInfoCard({ quote, onStatusChange }) {
 
     return (
 
@@ -11,9 +7,7 @@ export default function QuoteInfoCard({
             <div className="card-body">
 
                 <h3 className="font-semibold">
-
                     Informations devis
-
                 </h3>
 
                 <div className="space-y-2">
@@ -39,9 +33,7 @@ export default function QuoteInfoCard({
                         <span>
                             {new Date(
                                 quote.createdAt
-                            ).toLocaleDateString(
-                                'fr-FR'
-                            )}
+                            ).toLocaleDateString("fr-FR")}
                         </span>
 
                     </div>
@@ -52,9 +44,34 @@ export default function QuoteInfoCard({
                             Statut
                         </span>
 
-                        <QuoteStatusBadge
-                            status={quote.status}
-                        />
+                        <select
+                            className="select select-bordered select-sm w-40 rounded-lg"
+                            value={quote.status}
+                            onChange={(e) =>
+                                onStatusChange(e.target.value)
+                            }
+                        >
+                            <option value="DRAFT">
+                                Brouillon
+                            </option>
+
+                            <option value="PENDING">
+                                En attente
+                            </option>
+
+                            <option value="ACCEPTED">
+                                Accepté
+                            </option>
+
+                            <option value="REFUSED">
+                                Refusé
+                            </option>
+
+                            <option value="EXPIRED">
+                                Expiré
+                            </option>
+
+                        </select>
 
                     </div>
 
