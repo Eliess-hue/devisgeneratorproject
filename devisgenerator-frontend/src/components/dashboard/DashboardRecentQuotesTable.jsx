@@ -71,19 +71,12 @@ export default function DashboardRecentQuotesTable({quotes}) {
                                     <div className="flex items-center gap-2 whitespace-nowrap">
 
                                         <button
-                                            className="btn btn-xs bg-base-300 text-base-content border-none hover:bg-base-100 rounded-lg"
+                                            className="btn btn-xs bg-blue-900 text-blue-400 border-none hover:bg-blue-800 rounded-lg"
                                             onClick={() =>
                                                 navigate(
                                                     `/quotes/${quote.id}`
                                                 )
                                             }
-                                        >
-                                            Voir
-                                        </button>
-
-                                        <button
-                                            className="btn btn-xs bg-blue-900 text-blue-400 border-none hover:bg-blue-800 rounded-lg"
-                                            disabled
                                         >
                                             Modifier
                                         </button>
