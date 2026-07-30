@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { register } from '../api/apiAuth.js'
 import Alert from "../components/common/Alert.jsx"
+import logo from '../assets/devgenerlogo.png'
 
 export default function RegisterPage() {
 
@@ -97,7 +98,7 @@ export default function RegisterPage() {
 
                 {/* Logo */}
                 <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 rounded-full bg-primary"></div>
+                    <img src={logo} alt="DevisApp" className="h-32 w-auto" />
                 </div>
 
                 {/* Titre */}

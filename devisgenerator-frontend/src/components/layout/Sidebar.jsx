@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import UserProfile from './UserProfile'
 import {useAuth} from "../../context/AuthContext.jsx"
+import logo from '../../assets/devgenerlogo.png'
 
 export default function Sidebar() {
 
@@ -33,11 +34,7 @@ export default function Sidebar() {
             {/* Logo */}
             <div className="p-6 flex items-center gap-3">
 
-                <div className="w-10 h-10 rounded-full bg-primary"></div>
-
-                <span className="font-bold text-lg">
-                    DevisApp
-                </span>
+                <img src={logo} alt="DevisApp" className="h-32 w-auto"/>
 
             </div>
 
