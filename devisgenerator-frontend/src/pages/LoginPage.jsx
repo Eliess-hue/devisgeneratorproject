@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {getMe, login} from '../api/apiAuth.js'
 import Alert from "../components/common/Alert.jsx"
+import logo from '../assets/devgenerlogo.png'
 
 export default function LoginPage() {
     const { saveAuth } = useAuth()
@@ -125,7 +126,7 @@ export default function LoginPage() {
 
                 {/* Logo */}
                 <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 rounded-full bg-primary"></div>
+                    <img src={logo} alt="DevisApp" className="h-32 w-auto" />
                 </div>
 
                 {/* Titre */}
