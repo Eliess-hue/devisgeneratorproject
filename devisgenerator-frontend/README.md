@@ -1,16 +1,40 @@
-# React + Vite
+# Générateur de Devis — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[← Retour au README principal](../README.md)
 
-Currently, two official plugins are available:
+Interface utilisateur développée avec React pour l'application de génération de devis.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Prérequis
+* Node.js 22+
+* npm
 
-## React Compiler
+## Configuration
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+L'URL de l'API backend est configurée via la variable d'environnement `VITE_API_URL`.
 
-## Expanding the ESLint configuration
+Créer un fichier `.env` à la racine de `devisgenerator-frontend/` :
+```env
+VITE_API_URL=http://localhost:8080
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Lancer en local
+
+```bash
+npm install
+npm run dev
+```
+
+L'application est alors disponible sur `http://localhost:5173`.
+
+## Build de production
+
+```bash
+npm run build
+npm run preview
+```
+
+## Qualité de code
+
+```bash
+npm run lint
+```
